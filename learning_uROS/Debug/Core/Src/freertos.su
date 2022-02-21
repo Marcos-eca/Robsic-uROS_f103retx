@@ -1,0 +1,15 @@
+freertos.c:238:6:MX_FREERTOS_Init	8	static
+freertos.c:292:6:task_ros2_function	360	dynamic
+freertos.c:501:6:digital_inputs_task	24	static
+freertos.c:542:6:analog_input_task	16	static
+freertos.c:585:6:automatic_manual_mode_Task	16	static
+freertos.c:685:6:golfinho_check_status_timer_callback	32	static
+freertos.c:709:6:golfinho_motion_info_timer_callback	40	static
+freertos.c:749:6:receive_commands_from_ros_callback	24	static
+freertos.c:769:6:golfinho_imu_timer_callback	56	static
+freertos.c:798:6:golfinho_gps_timer_callback	56	static
+freertos.c:826:6:golfinho_joint_steering_timer_callback	56	static
+freertos.c:862:6:ADC_select_channel_break	24	static
+freertos.c:876:6:ADC_select_channel_Throttle	24	static
+freertos.c:889:6:ADC_select_channel_batery_car	24	static
+freertos.c:902:6:ADC_select_channel_system_batery	24	static
