@@ -1,6 +1,6 @@
 # Uros stm32f1xxx
 
-# Diagrama de blocos
+## Diagrama de blocos
 
 ![Descrição do código](block_code_description.jpeg)
 
