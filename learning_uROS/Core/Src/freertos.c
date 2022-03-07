@@ -31,6 +31,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "adc.h"
+#include "can.h"
 #include "dac.h"
 
 #include "stdbool.h"
@@ -112,6 +113,7 @@ sensor_msgs__msg__NavSatFix gps_;
 
 sensor_msgs__msg__JointState joint_steering;
 
+
 std_msgs__msg__UInt16MultiArray receive;
 
 uint8_t flg=0; //modo de operação do golfinho manual-0 ; auto-1;
@@ -130,6 +132,14 @@ uint16_t analog_data_input_auto[5]={0,0,0,0,0};
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+
+CAN_TxHeaderTypeDef txHeader; //CAN Bus Transmit Header
+CAN_RxHeaderTypeDef rxHeader; //CAN Bus Receive Header
+uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
+CAN_FilterTypeDef canfil; //CAN Bus Filter
+uint32_t canMailbox; //CAN Bus Mail box variable
+uint8_t raw;
+
 
 /* Subscriber declaration */
 
@@ -239,6 +249,30 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
+
+	  txHeader.DLC = 4;
+	  txHeader.IDE = CAN_ID_STD; //CAN_ID_EXT
+	  txHeader.RTR = CAN_RTR_DATA;
+	  txHeader.StdId = 0x2BC;
+
+	  canfil.FilterActivation = CAN_FILTER_ENABLE;
+	  canfil.FilterBank = 10;  // which filter bank to use from the assigned ones
+	  canfil.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+	  canfil.FilterIdHigh =0xFF;
+	  canfil.FilterIdLow = 0;
+	  canfil.FilterMaskIdHigh = 0xFF;
+	  canfil.FilterMaskIdLow = 0x0000;
+	  canfil.FilterMode = CAN_FILTERMODE_IDMASK;
+	  canfil.FilterScale = CAN_FILTERSCALE_32BIT;
+	  canfil.SlaveStartFilterBank = 0;  // how many filters to assign to the CAN1 (master can)
+	 HAL_CAN_ConfigFilter(&hcan,&canfil);
+
+	 HAL_CAN_Start(&hcan);
+
+	 if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	 {
+		  Error_Handler();
+	 }
 
   /* USER CODE END Init */
   /* Create the mutex(es) */
@@ -355,7 +389,7 @@ void task_ros2_function(void *argument)
 			  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
 			  "/golfinho/imu");
 
-	  // ros2_joints_pub
+	  // ros2_gps
 	  rclc_publisher_init_default(
 			  &ros2_gps_pub,
 			  &node,
@@ -450,11 +484,6 @@ void task_ros2_function(void *argument)
 				    	gps_.header.frame_id.capacity = STRING_BUFFER_LEN;
 
 	// joint_steering
-
-				    	sensor_msgs__msg__JointState__init(&joint_steering);
-				    	joint_steering=*sensor_msgs__msg__JointState__create();
-
-				    /*
 				    	char joint_steering_buffer[STRING_BUFFER_LEN];
 				    	joint_steering.header.frame_id.data = joint_steering_buffer;
 				    	joint_steering.header.frame_id.capacity = STRING_BUFFER_LEN;
@@ -479,7 +508,7 @@ void task_ros2_function(void *argument)
 					 	joint_steering.effort.capacity=1;
 					 	joint_steering.effort.size=1;
 					 	joint_steering.effort.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
-*/
+
 	  // Create a timer
 	  rclc_timer_init_default(&golfinho_check_status_timer, &support, RCL_MS_TO_NS(500), golfinho_check_status_timer_callback);
 	  rclc_timer_init_default(&golfinho_motion_info_timer, &support, RCL_MS_TO_NS(100), golfinho_motion_info_timer_callback);
@@ -488,7 +517,7 @@ void task_ros2_function(void *argument)
 	  rclc_timer_init_default(&golfinho_joint_steering_timer, &support, RCL_MS_TO_NS(100), golfinho_joint_steering_timer_callback);
 
 	  // Create executor
-	  rclc_executor_init(&executor, &support.context,6, &allocator);
+	  rclc_executor_init(&executor, &support.context,5, &allocator);
 
 	  rclc_executor_add_subscription(&executor, &receive_commands_from_ros_sub, &receive,
 	 	  			  &receive_commands_from_ros_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
@@ -542,6 +571,9 @@ void digital_inputs_task(void *argument)
 			    digital_data_input_manual[1]=4;
 		  }else
 			  digital_data_input_manual[1]=1;
+        //steer
+	    HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &rxHeader, canRX);
+	    raw=canRX[7];
 
 		  osDelay(100);
 	  }
@@ -725,6 +757,7 @@ void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call
 void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {
 	if(flg){ // status dos dois modos de operação
+		   golfinho_motion_info_gpio_output_msg.data.data[1]=raw;
 
 		if(digital_data_input_auto[3]) //acelerador
 		   golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_auto[2]*100/4096;
@@ -739,6 +772,8 @@ void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_
 		golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
 		golfinho_motion_info_gpio_output_msg.data.data[5]=analog_data_input_manual[5]*100/4096; // batery system
 			}else {
+
+				   golfinho_motion_info_gpio_output_msg.data.data[1]=raw;
 
 				if(digital_data_input_manual[3]) //acelerador
 			        golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_manual[2]*100/4096;
@@ -839,6 +874,7 @@ void golfinho_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 }
 
 
+
 void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {
 	int device_id=012;
@@ -871,8 +907,6 @@ void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_ca
 	}
 
 }
-
-
 
 
 void ADC_select_channel_break (void)
@@ -927,5 +961,12 @@ void ADC_select_channel_system_batery(void)
 	    Error_Handler();
 	  }
 }
-/* USER CODE END Application */
 
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
+{
+  if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &rxHeader, canRX) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+/* USER CODE END Application */

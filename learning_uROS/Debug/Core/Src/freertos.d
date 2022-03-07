@@ -41,7 +41,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
- ../Core/Inc/dma.h ../Core/Inc/adc.h ../Core/Inc/dac.h \
+ ../Core/Inc/dma.h ../Core/Inc/adc.h ../Core/Inc/can.h ../Core/Inc/dac.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rcl/rcl.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rcl/init.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rcl/allocator.h \
@@ -277,6 +277,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/dma.h:
 
 ../Core/Inc/adc.h:
+
+../Core/Inc/can.h:
 
 ../Core/Inc/dac.h:
 
