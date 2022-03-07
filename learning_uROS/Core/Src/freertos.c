@@ -53,6 +53,7 @@
 #include <std_msgs/msg/u_int16_multi_array.h>
 #include <std_msgs/msg/u_int8_multi_array.h>
 #include <std_msgs/msg/float32_multi_array.h>
+#include <std_msgs/msg/string.h>
 #include <sensor_msgs/msg/imu.h>
 #include <sensor_msgs/msg/nav_sat_fix.h>
 #include <sensor_msgs/msg/joint_state.h>
@@ -111,6 +112,8 @@ sensor_msgs__msg__NavSatFix gps_;
 
 sensor_msgs__msg__JointState joint_steering;
 
+std_msgs__msg__UInt16MultiArray receive;
+
 uint8_t flg=0; //modo de operação do golfinho manual-0 ; auto-1;
 
 uint8_t digital_data_input_manual[5]={0,0,0,0,0};
@@ -138,7 +141,6 @@ rcl_publisher_t ros2_imu_pub;
 rcl_publisher_t ros2_gps_pub;
 rcl_publisher_t ros2_joint_steering_pub;
 
-
 rcl_subscription_t receive_commands_from_ros_sub;
 
 /* ROS timer declaration */
@@ -150,7 +152,7 @@ rcl_timer_t golfinho_gps_timer;
 rcl_timer_t golfinho_joint_steering_timer;
 
 /* Messages declaration */
-std_msgs__msg__UInt16MultiArray receive;
+
 
 HAL_StatusTypeDef status;
 
@@ -205,7 +207,15 @@ void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_ca
 
 
 void receive_commands_from_ros_callback(const void * msgin);
-/* USER CODE BEGIN FunctionPrototypes */
+
+void task_ros2_function(void *argument);
+void digital_inputs_task(void *argument);
+void analog_input_task(void *argument);
+void automatic_manual_mode_Task(void *argument);
+void ADC_select_channel_break (void);
+void ADC_select_channel_Throttle (void);
+void ADC_select_channel_batery_car(void);
+void ADC_select_channel_system_batery(void);
 
 bool cubemx_transport_open(struct uxrCustomTransport * transport);
 bool cubemx_transport_close(struct uxrCustomTransport * transport);
@@ -219,14 +229,6 @@ void * microros_zero_allocate(size_t number_of_elements, size_t size_of_element,
 
 /* USER CODE END FunctionPrototypes */
 
-void task_ros2_function(void *argument);
-void digital_inputs_task(void *argument);
-void analog_input_task(void *argument);
-void automatic_manual_mode_Task(void *argument);
-void ADC_select_channel_break (void);
-void ADC_select_channel_Throttle (void);
-void ADC_select_channel_batery_car(void);
-void ADC_select_channel_system_batery(void);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -448,20 +450,36 @@ void task_ros2_function(void *argument)
 				    	gps_.header.frame_id.capacity = STRING_BUFFER_LEN;
 
 	// joint_steering
-				   // 	int cap=5,siz=5;
-				   // 	char name_[5]={"steer"};
+
+				    	sensor_msgs__msg__JointState__init(&joint_steering);
+				    	joint_steering=*sensor_msgs__msg__JointState__create();
+
+				    /*
 				    	char joint_steering_buffer[STRING_BUFFER_LEN];
 				    	joint_steering.header.frame_id.data = joint_steering_buffer;
 				    	joint_steering.header.frame_id.capacity = STRING_BUFFER_LEN;
 
-				    //	joint_steering.name.capacity=5;
-					//	joint_steering.name.size=5;
-					//	joint_steering.name.data=name_;
-					//	joint_steering.name.data->capacity=cap;
-					//	joint_steering.name.data->size=siz;
-					//	joint_steering.name.data->data=name_;
+				    	joint_steering.name.capacity=1;
+						joint_steering.name.size=1;
+						joint_steering.name.data=(rosidl_runtime_c__String *) pvPortMalloc(golfinho_motion_info_gpio_output_msg.data.capacity * sizeof(rosidl_runtime_c__String));
 
+						joint_steering.name.data->capacity=5;
+						joint_steering.name.data->size=5;
+						joint_steering.name.data->data=(char*) pvPortMalloc(joint_steering.name.capacity * sizeof(char));
+					 	strcpy(joint_steering.name.data->data, "steer");
 
+					 	joint_steering.velocity.capacity=1;
+					 	joint_steering.velocity.size=1;
+					 	joint_steering.velocity.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
+
+					 	joint_steering.position.capacity=1;
+					 	joint_steering.position.size=1;
+					 	joint_steering.position.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
+
+					 	joint_steering.effort.capacity=1;
+					 	joint_steering.effort.size=1;
+					 	joint_steering.effort.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
+*/
 	  // Create a timer
 	  rclc_timer_init_default(&golfinho_check_status_timer, &support, RCL_MS_TO_NS(500), golfinho_check_status_timer_callback);
 	  rclc_timer_init_default(&golfinho_motion_info_timer, &support, RCL_MS_TO_NS(100), golfinho_motion_info_timer_callback);
@@ -476,9 +494,9 @@ void task_ros2_function(void *argument)
 	 	  			  &receive_commands_from_ros_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
 	  rclc_executor_add_timer(&executor, &golfinho_check_status_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_motion_info_timer);
+	  rclc_executor_add_timer(&executor, &golfinho_joint_steering_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_imu_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_gps_timer);
-	  rclc_executor_add_timer(&executor, &golfinho_joint_steering_timer);
 
       // Run executor
 	  rclc_executor_spin(&executor);
@@ -503,8 +521,7 @@ void digital_inputs_task(void *argument)
   /* USER CODE BEGIN digital_inputs_task */
   /* Infinite loop */
 	 uint8_t stats[3]={0,0,0};
-	  for(;;)
-	  {
+	  for(;;){
 
 		  // key switch
 		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6));
@@ -525,7 +542,6 @@ void digital_inputs_task(void *argument)
 			    digital_data_input_manual[1]=4;
 		  }else
 			  digital_data_input_manual[1]=1;
-
 
 		  osDelay(100);
 	  }
@@ -842,9 +858,9 @@ void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_ca
 		joint_steering.header.stamp.sec = ts.tv_sec;
 		joint_steering.header.stamp.nanosec = ts.tv_nsec;
 
-	//	joint_steering.position.data=&data0;
-	//	joint_steering.velocity.data=&data1;
-	//	joint_steering.effort.data=&data2;
+		joint_steering.position.data=1;
+		joint_steering.velocity.data=2;
+		joint_steering.effort.data=3;
 
 		rcl_ret_t ret = rcl_publish(&ros2_joint_steering_pub,&joint_steering, NULL);
 

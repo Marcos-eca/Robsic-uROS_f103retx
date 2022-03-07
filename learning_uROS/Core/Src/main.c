@@ -50,11 +50,11 @@
 /* USER CODE BEGIN PV */
 
 
-//CAN_RxHeaderTypeDef rxHeader; //CAN Bus Transmit Header
-//CAN_TxHeaderTypeDef txHeader; //CAN Bus Receive Header
-//uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
-//CAN_FilterTypeDef canfil; //CAN Bus Filter
-//uint32_t canMailbox; //CAN Bus Mail box variable
+CAN_TxHeaderTypeDef txHeader; //CAN Bus Transmit Header
+CAN_RxHeaderTypeDef rxHeader; //CAN Bus Receive Header
+uint8_t canRX[8] = {1,1,1,1,1,1,1,1};  //CAN Bus Receive Buffer
+CAN_FilterTypeDef canfil; //CAN Bus Filter
+uint32_t canMailbox; //CAN Bus Mail box variable
 
 /* USER CODE END PV */
 
@@ -62,6 +62,7 @@
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1);
 
 /* USER CODE END PFP */
 
@@ -76,13 +77,14 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	 //uint16_t raw;
-	 //char msg[10];
+	 uint8_t raw;
+	 char msg[10];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */  HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -104,24 +106,30 @@ int main(void)
   MX_CAN_Init();
   /* USER CODE BEGIN 2 */
 
- // txHeader.DLC = 8;
- // txHeader.IDE = CAN_ID_STD;
- // txHeader.RTR = CAN_RTR_DATA;
-//  txHeader.StdId = 0x1E7;
+  txHeader.DLC = 2;
+  txHeader.IDE = CAN_ID_STD; //CAN_ID_EXT
+  txHeader.RTR = CAN_RTR_DATA;
+  txHeader.StdId = 0x2BC;
 
-  //	  canfil.FilterFIFOAssignment = CAN_RX_FIFO0;
-  //	  canfil.FilterIdHigh = 0x245<<5;;
-  //	  canfil.FilterIdLow = 0;
-  //	  canfil.FilterMaskIdHigh = 0;
-  //	  canfil.FilterMaskIdLow = 0;
-  //	  canfil.FilterScale = CAN_FILTERSCALE_32BIT;
- // 	  canfil.FilterActivation = ENABLE;
+  canfil.FilterActivation = CAN_FILTER_ENABLE;
+  canfil.FilterBank = 18;  // which filter bank to use from the assigned ones
+  canfil.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  canfil.FilterIdHigh =0x2BC<<5;
+  canfil.FilterIdLow = 0;
+  canfil.FilterMaskIdHigh = 0x2BC<<5;
+  canfil.FilterMaskIdLow = 0x0000;
+  canfil.FilterMode = CAN_FILTERMODE_IDMASK;
+  canfil.FilterScale = CAN_FILTERSCALE_32BIT;
+  canfil.SlaveStartFilterBank = 0;  // how many filters to assign to the CAN1 (master can)
+ HAL_CAN_ConfigFilter(&hcan,&canfil);
 
-// HAL_CAN_ConfigFilter(&hcan,&canfil);
+ HAL_CAN_Start(&hcan);
 
-// HAL_CAN_Start(&hcan);
+ if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+ {
+	  Error_Handler();
+ }
 
-// HAL_CAN_ActivateNotification(&hcan,CAN_IT_RX_FIFO0_MSG_PENDING);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -136,13 +144,22 @@ int main(void)
 
   while (1){
 
-	//uint8_t csend[] = {0x280};
-	//HAL_CAN_AddTxMessage(&hcan,&txHeader,csend,&canMailbox);
+	uint8_t csend[] = {0x0A,0x0B};
+	HAL_CAN_AddTxMessage(&hcan,&txHeader,csend,&canMailbox);
+	//	HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &rxHeader, canRX);
+        int i=0;
+		if(i<8)
+			i++;
+		else
+		i=0;
 
-    //raw=canRX[5];
-	//    sprintf(msg, "%hu\r\n", raw);
-	//    HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-	//	HAL_Delay(50);
+        raw=canRX[i];
+	    sprintf(msg, "%hu\r\n", raw);
+	    HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+		i++;
+
+
+		HAL_Delay(50);
 
     /* USER CODE END WHILE */
 
@@ -198,11 +215,14 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-//void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
-//{
-//	HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &rxHeader, canRX);
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
+{
+  if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &rxHeader, canRX) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
 
-//}
 
 /* USER CODE END 4 */
 

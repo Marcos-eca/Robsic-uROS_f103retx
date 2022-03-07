@@ -165,6 +165,10 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/float32_multi_array__struct.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/float32_multi_array__functions.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/float32_multi_array__type_support.h \
+ /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/string.h \
+ /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/string__struct.h \
+ /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/string__functions.h \
+ /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/string__type_support.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/imu.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/imu__struct.h \
  /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/quaternion__struct.h \
@@ -521,6 +525,14 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/float32_multi_array__functions.h:
 
 /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/float32_multi_array__type_support.h:
+
+/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/string.h:
+
+/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/string__struct.h:
+
+/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/string__functions.h:
+
+/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/string__type_support.h:
 
 /home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/imu.h:
 
