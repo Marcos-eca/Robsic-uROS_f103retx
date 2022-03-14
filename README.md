@@ -2,6 +2,6 @@
 
 ## Diagrama de blocos
 
-![Descrição do código](block_code_description.jpeg)
+![Descrição do código](block_code_description_.jpeg)
 
 - A cor em vermelho destaca o que falta para implementar no código.
