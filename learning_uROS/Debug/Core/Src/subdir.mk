@@ -22,6 +22,7 @@ C_SRCS += \
 ../Core/Src/stm32f1xx_it.c \
 ../Core/Src/syscalls.c \
 ../Core/Src/system_stm32f1xx.c \
+../Core/Src/tim.c \
 ../Core/Src/usart.c 
 
 OBJS += \
@@ -42,6 +43,7 @@ OBJS += \
 ./Core/Src/stm32f1xx_it.o \
 ./Core/Src/syscalls.o \
 ./Core/Src/system_stm32f1xx.o \
+./Core/Src/tim.o \
 ./Core/Src/usart.o 
 
 C_DEPS += \
@@ -62,6 +64,7 @@ C_DEPS += \
 ./Core/Src/stm32f1xx_it.d \
 ./Core/Src/syscalls.d \
 ./Core/Src/system_stm32f1xx.d \
+./Core/Src/tim.d \
 ./Core/Src/usart.d 
 
 
@@ -72,7 +75,7 @@ Core/Src/%.o: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/can.d ./Core/Src/can.o ./Core/Src/custom_memory_manager.d ./Core/Src/custom_memory_manager.o ./Core/Src/dac.d ./Core/Src/dac.o ./Core/Src/dma.d ./Core/Src/dma.o ./Core/Src/dma_transport.d ./Core/Src/dma_transport.o ./Core/Src/freertos.d ./Core/Src/freertos.o ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/microros_allocators.d ./Core/Src/microros_allocators.o ./Core/Src/microros_time.d ./Core/Src/microros_time.o ./Core/Src/stepper.d ./Core/Src/stepper.o ./Core/Src/stm32f1xx_hal_msp.d ./Core/Src/stm32f1xx_hal_msp.o ./Core/Src/stm32f1xx_hal_timebase_tim.d ./Core/Src/stm32f1xx_hal_timebase_tim.o ./Core/Src/stm32f1xx_it.d ./Core/Src/stm32f1xx_it.o ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/system_stm32f1xx.d ./Core/Src/system_stm32f1xx.o ./Core/Src/usart.d ./Core/Src/usart.o
+	-$(RM) ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/can.d ./Core/Src/can.o ./Core/Src/custom_memory_manager.d ./Core/Src/custom_memory_manager.o ./Core/Src/dac.d ./Core/Src/dac.o ./Core/Src/dma.d ./Core/Src/dma.o ./Core/Src/dma_transport.d ./Core/Src/dma_transport.o ./Core/Src/freertos.d ./Core/Src/freertos.o ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/microros_allocators.d ./Core/Src/microros_allocators.o ./Core/Src/microros_time.d ./Core/Src/microros_time.o ./Core/Src/stepper.d ./Core/Src/stepper.o ./Core/Src/stm32f1xx_hal_msp.d ./Core/Src/stm32f1xx_hal_msp.o ./Core/Src/stm32f1xx_hal_timebase_tim.d ./Core/Src/stm32f1xx_hal_timebase_tim.o ./Core/Src/stm32f1xx_it.d ./Core/Src/stm32f1xx_it.o ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/system_stm32f1xx.d ./Core/Src/system_stm32f1xx.o ./Core/Src/tim.d ./Core/Src/tim.o ./Core/Src/usart.d ./Core/Src/usart.o
 
 .PHONY: clean-Core-2f-Src
 

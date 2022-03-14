@@ -33,8 +33,11 @@
 #include "adc.h"
 #include "can.h"
 #include "dac.h"
-
+#include "tim.h"
 #include "stdbool.h"
+#include <time.h>
+#include <math.h>
+#include "stepper.h"
 
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
@@ -45,9 +48,8 @@
 #include <rmw_microros/rmw_microros.h>
 #include <rosidl_runtime_c/string.h>
 
-#include <time.h>
-#include <math.h>
-
+#include <std_msgs/msg/u_int8.h>
+#include <std_msgs/msg/u_int32.h>
 #include <std_msgs/msg/int32.h>
 #include <std_msgs/msg/u_int32.h>
 #include <sensor_msgs/msg/nav_sat_fix.h>
@@ -58,8 +60,14 @@
 #include <sensor_msgs/msg/imu.h>
 #include <sensor_msgs/msg/nav_sat_fix.h>
 #include <sensor_msgs/msg/joint_state.h>
-
 #include <std_msgs/msg/float32.h>
+#include <nav_msgs/msg/odometry.h>
+
+
+#include <geometry_msgs/msg/twist.h>
+
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,16 +121,43 @@ sensor_msgs__msg__NavSatFix gps_;
 
 sensor_msgs__msg__JointState joint_steering;
 
+// Twist (comand_vel)
 
-std_msgs__msg__UInt16MultiArray receive;
+geometry_msgs__msg__Twist cmd_vel;
+
+// operation mode
+
+std_msgs__msg__UInt8 operation_mode_;
+
+// odometry
+
+nav_msgs__msg__Odometry odom;
+
+// buffers
 
 uint8_t flg=0; //modo de operação do golfinho manual-0 ; auto-1;
-
 uint8_t digital_data_input_manual[5]={0,0,0,0,0};
 uint16_t analog_data_input_manual[5]={0,0,0,0,0};
 uint8_t digital_data_input_auto[5]={0,0,0,0,0};
 uint16_t analog_data_input_auto[5]={0,0,0,0,0};
 
+double cmd_vel_buff[2]={0,0}; // buffer
+
+
+// CAN Variables
+
+CAN_TxHeaderTypeDef txHeader; //CAN Bus Transmit Header
+CAN_RxHeaderTypeDef rxHeader; //CAN Bus Receive Header
+uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
+CAN_FilterTypeDef canfil; //CAN Bus Filter
+uint32_t canMailbox; //CAN Bus Mail box variable
+uint8_t steer_info;
+
+#define TF_STEPPER_INT 1<<0
+#define TF_STEPPER_DATA 1<<1
+#define TF_MAIN_ROS_CMD 1<<0
+
+stepper_t stepper;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -133,15 +168,7 @@ uint16_t analog_data_input_auto[5]={0,0,0,0,0};
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-CAN_TxHeaderTypeDef txHeader; //CAN Bus Transmit Header
-CAN_RxHeaderTypeDef rxHeader; //CAN Bus Receive Header
-uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
-CAN_FilterTypeDef canfil; //CAN Bus Filter
-uint32_t canMailbox; //CAN Bus Mail box variable
-uint8_t raw;
 
-
-/* Subscriber declaration */
 
 /* Publisher declaration */
 
@@ -151,7 +178,14 @@ rcl_publisher_t ros2_imu_pub;
 rcl_publisher_t ros2_gps_pub;
 rcl_publisher_t ros2_joint_steering_pub;
 
-rcl_subscription_t receive_commands_from_ros_sub;
+rcl_publisher_t odom_pub;
+
+
+/* Subscriber declaration */
+
+rcl_subscription_t cmd_vel_sub;
+
+rcl_subscription_t operation_mode_sub;
 
 /* ROS timer declaration */
 
@@ -161,10 +195,13 @@ rcl_timer_t golfinho_imu_timer;
 rcl_timer_t golfinho_gps_timer;
 rcl_timer_t golfinho_joint_steering_timer;
 
-/* Messages declaration */
+rcl_timer_t operation_mode_timer;
+rcl_timer_t odom_timer;
 
 
 HAL_StatusTypeDef status;
+
+
 
 /* USER CODE END Variables */
 /* Definitions for task_ros2 */
@@ -200,6 +237,20 @@ const osThreadAttr_t auto_man_mod_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for task_stepper */
+osThreadId_t task_stepperHandle;
+const osThreadAttr_t task_stepper_attributes = {
+  .name = "task_stepper",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for Imu_gps_steer */
+osThreadId_t Imu_gps_steerHandle;
+const osThreadAttr_t Imu_gps_steer_attributes = {
+  .name = "Imu_gps_steer",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for analog_mutex */
 osMutexId_t analog_mutexHandle;
 const osMutexAttr_t analog_mutex_attributes = {
@@ -209,14 +260,23 @@ const osMutexAttr_t analog_mutex_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
+//Publishers
+
 void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 
+void odom_callback(rcl_timer_t * timer, int64_t last_call_time);
 
-void receive_commands_from_ros_callback(const void * msgin);
+//Subscribers
+
+void cmd_vel_callback(const void * msgin);
+
+void operation_mode_callback(const void * msgin);
+
+// Tasks and functions
 
 void task_ros2_function(void *argument);
 void digital_inputs_task(void *argument);
@@ -226,6 +286,9 @@ void ADC_select_channel_break (void);
 void ADC_select_channel_Throttle (void);
 void ADC_select_channel_batery_car(void);
 void ADC_select_channel_system_batery(void);
+
+
+// Functions used by microros
 
 bool cubemx_transport_open(struct uxrCustomTransport * transport);
 bool cubemx_transport_close(struct uxrCustomTransport * transport);
@@ -237,9 +300,18 @@ void microros_deallocate(void * pointer, void * state);
 void * microros_reallocate(void * pointer, size_t size, void * state);
 void * microros_zero_allocate(size_t number_of_elements, size_t size_of_element, void * state);
 
+
+
+
 /* USER CODE END FunctionPrototypes */
 
-
+void task_ros2_function(void *argument);
+void digital_inputs_task(void *argument);
+void analog_input_task(void *argument);
+void automatic_manual_mode_Task(void *argument);
+void task_stepper_function(void *argument);
+void Imu_gps_steer_function(void *argument);
+void change_period(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
@@ -250,10 +322,16 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
+	  MX_TIM2_Init();
+
+
+   // CAN configuration transmiter
 	  txHeader.DLC = 4;
 	  txHeader.IDE = CAN_ID_STD; //CAN_ID_EXT
 	  txHeader.RTR = CAN_RTR_DATA;
 	  txHeader.StdId = 0x2BC;
+
+   // CAN configuration filter
 
 	  canfil.FilterActivation = CAN_FILTER_ENABLE;
 	  canfil.FilterBank = 10;  // which filter bank to use from the assigned ones
@@ -266,9 +344,9 @@ void MX_FREERTOS_Init(void) {
 	  canfil.FilterScale = CAN_FILTERSCALE_32BIT;
 	  canfil.SlaveStartFilterBank = 0;  // how many filters to assign to the CAN1 (master can)
 	 HAL_CAN_ConfigFilter(&hcan,&canfil);
-
+     // Start Can
 	 HAL_CAN_Start(&hcan);
-
+     // Start Callback receive data
 	 if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 	 {
 		  Error_Handler();
@@ -278,8 +356,7 @@ void MX_FREERTOS_Init(void) {
   /* Create the mutex(es) */
   /* creation of analog_mutex */
   analog_mutexHandle = osMutexNew(&analog_mutex_attributes);
-  HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
-  HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
@@ -309,6 +386,12 @@ void MX_FREERTOS_Init(void) {
   /* creation of auto_man_mod */
   auto_man_modHandle = osThreadNew(automatic_manual_mode_Task, NULL, &auto_man_mod_attributes);
 
+  /* creation of task_stepper */
+  task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
+
+  /* creation of Imu_gps_steer */
+  Imu_gps_steerHandle = osThreadNew(Imu_gps_steer_function, NULL, &Imu_gps_steer_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -316,6 +399,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_task_ros2_function */
@@ -328,21 +412,21 @@ void MX_FREERTOS_Init(void) {
 void task_ros2_function(void *argument)
 {
   /* USER CODE BEGIN task_ros2_function */
-  /* Infinite loop */
-	// micro-ROS configuration
-	  rmw_uros_set_custom_transport(
-		true,
-		(void *) &huart2,
-		cubemx_transport_open,
-		cubemx_transport_close,
-		cubemx_transport_write,
-		cubemx_transport_read);
 
-	  rcl_allocator_t freeRTOS_allocator = rcutils_get_zero_initialized_allocator();
-	  freeRTOS_allocator.allocate = microros_allocate;
-	  freeRTOS_allocator.deallocate = microros_deallocate;
-	  freeRTOS_allocator.reallocate = microros_reallocate;
-	  freeRTOS_allocator.zero_allocate =  microros_zero_allocate;
+	// micro-ROS configuration
+		  rmw_uros_set_custom_transport(
+			true,
+			(void *) &huart2,
+			cubemx_transport_open,
+			cubemx_transport_close,
+			cubemx_transport_write,
+			cubemx_transport_read);
+
+		  rcl_allocator_t freeRTOS_allocator = rcutils_get_zero_initialized_allocator();
+		  freeRTOS_allocator.allocate = microros_allocate;
+		  freeRTOS_allocator.deallocate = microros_deallocate;
+		  freeRTOS_allocator.reallocate = microros_reallocate;
+		  freeRTOS_allocator.zero_allocate =  microros_zero_allocate;
 
 	  if (!rcutils_set_default_allocator(&freeRTOS_allocator)) {
 		  printf("Error on default allocators (line %d)\n", __LINE__);
@@ -397,20 +481,36 @@ void task_ros2_function(void *argument)
 			  "/golfinho/gps");
 
 	  // ros2_joint_steering_pub
+	//  rclc_publisher_init_default(
+	//		  &ros2_joint_steering_pub,
+	//		  &node,
+	//		  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
+	//		  "/golfinho/joint_steering");
+
+	  // odom_pub
 	  rclc_publisher_init_default(
-			  &ros2_joint_steering_pub,
+			  &odom_pub,
 			  &node,
-			  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
-			  "/golfinho/joint_steering");
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(nav_msgs, msg, Odometry),
+			  "/golfinho/odom");
 
-	  //create gpio_output_sub
-	  receive_commands_from_ros_sub = rcl_get_zero_initialized_subscription();
+	  //create cmd_vel_sub
+	  cmd_vel_sub = rcl_get_zero_initialized_subscription();
 
-	  rclc_subscription_init_best_effort(
-			  &receive_commands_from_ros_sub,
+      rclc_subscription_init_best_effort(
+			  &cmd_vel_sub,
 			  &node,
-			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt16MultiArray),
-			  "/receive_commands_from_ros");
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+			  "/golfinho/cmd_vel");
+
+	  //create operation_mode_sub
+	  operation_mode_sub = rcl_get_zero_initialized_subscription();
+
+      rclc_subscription_init_best_effort(
+			  &operation_mode_sub,
+			  &node,
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt8),
+			  "/golfinho/operation_mode");
 
 
 	  golfinho_check_status_msg.data.capacity = 5;
@@ -426,7 +526,7 @@ void task_ros2_function(void *argument)
 
 	 	  }
 
-	 	  strcpy(golfinho_check_status_msg.layout.dim.data[0].label.data, "reserved");
+	 	  strcpy(golfinho_check_status_msg.layout.dim.data[0].label.data, "reserv");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[1].label.data, "status");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[2].label.data, "op_mod");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[3].label.data, "key_th");
@@ -453,25 +553,6 @@ void task_ros2_function(void *argument)
 			 	  strcpy(golfinho_motion_info_gpio_output_msg.layout.dim.data[4].label.data, "bat_car");
 			 	  strcpy(golfinho_motion_info_gpio_output_msg.layout.dim.data[5].label.data, "bat_sys");
 
-		 	    receive.data.capacity = 6;
-		 	    receive.data.size = 6;
-		 	    receive.data.data = (uint16_t*) pvPortMalloc(receive.data.capacity * sizeof(uint16_t));
-		 	    receive.layout.dim.capacity = 6;
-		 	    receive.layout.dim.size = 6;
-		 	    receive.layout.dim.data = (std_msgs__msg__MultiArrayDimension*) pvPortMalloc(receive.layout.dim.capacity * sizeof(std_msgs__msg__MultiArrayDimension));
-				 	  for (size_t i =0; i< receive.layout.dim.capacity; i++){
-				 	    receive.layout.dim.data[i].label.capacity = 6;
-				 		receive.layout.dim.data[i].label.size = 6;
-				 		receive.layout.dim.data[i].label.data = (char*) pvPortMalloc(receive.layout.dim.data[i].label.capacity * sizeof(char));
-
-				 	  }
-				 	    strcpy(receive.layout.dim.data[0].label.data, "k_sw");
-				 	    strcpy(receive.layout.dim.data[1].label.data, "op_mod");
-				    	strcpy(receive.layout.dim.data[2].label.data, "k_th");
-				    	strcpy(receive.layout.dim.data[3].label.data, "k_brk");
-				 	    strcpy(receive.layout.dim.data[4].label.data, "th_an");
-				    	strcpy(receive.layout.dim.data[5].label.data, "brk_an");
-
 	//imu
                         int STRING_BUFFER_LEN=10;
 				    	char imu_buffer[STRING_BUFFER_LEN];
@@ -483,7 +564,20 @@ void task_ros2_function(void *argument)
 				    	gps_.header.frame_id.data = gps_buffer;
 				    	gps_.header.frame_id.capacity = STRING_BUFFER_LEN;
 
+	//odom
+				    	char odom_buffer[STRING_BUFFER_LEN];
+				    	odom.header.frame_id.data = odom_buffer;
+				    	odom.header.frame_id.capacity = STRING_BUFFER_LEN;
+
+				    	odom.child_frame_id.size=16;
+				    	odom.child_frame_id.capacity=16;
+				    	//char child_frame__id[15];
+					 	//strcpy(child_frame__id,"base_footprint");
+				    	odom.child_frame_id.data=(char*) pvPortMalloc(odom.child_frame_id.capacity* sizeof(char));//child_frame__id;
+				    	strcpy(odom.child_frame_id.data,"base_link");
+
 	// joint_steering
+				    	/*
 				    	char joint_steering_buffer[STRING_BUFFER_LEN];
 				    	joint_steering.header.frame_id.data = joint_steering_buffer;
 				    	joint_steering.header.frame_id.capacity = STRING_BUFFER_LEN;
@@ -508,22 +602,27 @@ void task_ros2_function(void *argument)
 					 	joint_steering.effort.capacity=1;
 					 	joint_steering.effort.size=1;
 					 	joint_steering.effort.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
-
+*/
 	  // Create a timer
 	  rclc_timer_init_default(&golfinho_check_status_timer, &support, RCL_MS_TO_NS(500), golfinho_check_status_timer_callback);
 	  rclc_timer_init_default(&golfinho_motion_info_timer, &support, RCL_MS_TO_NS(100), golfinho_motion_info_timer_callback);
 	  rclc_timer_init_default(&golfinho_imu_timer, &support, RCL_MS_TO_NS(25), golfinho_imu_timer_callback);
 	  rclc_timer_init_default(&golfinho_gps_timer, &support, RCL_MS_TO_NS(1000), golfinho_gps_timer_callback);
-	  rclc_timer_init_default(&golfinho_joint_steering_timer, &support, RCL_MS_TO_NS(100), golfinho_joint_steering_timer_callback);
+	//  rclc_timer_init_default(&golfinho_joint_steering_timer, &support, RCL_MS_TO_NS(100), golfinho_joint_steering_timer_callback);
+	  rclc_timer_init_default(&odom_timer, &support, RCL_MS_TO_NS(200), odom_callback);
 
 	  // Create executor
-	  rclc_executor_init(&executor, &support.context,5, &allocator);
+	  rclc_executor_init(&executor, &support.context,7, &allocator);
 
-	  rclc_executor_add_subscription(&executor, &receive_commands_from_ros_sub, &receive,
-	 	  			  &receive_commands_from_ros_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
+	  rclc_executor_add_subscription(&executor, &cmd_vel_sub, &cmd_vel,
+	 	  			  &cmd_vel_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
+      rclc_executor_add_subscription(&executor, &operation_mode_sub, &operation_mode_,
+	 	  			  &operation_mode_callback, ON_NEW_DATA);
+
 	  rclc_executor_add_timer(&executor, &golfinho_check_status_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_motion_info_timer);
-	  rclc_executor_add_timer(&executor, &golfinho_joint_steering_timer);
+	//  rclc_executor_add_timer(&executor, &golfinho_joint_steering_timer);
+	  rclc_executor_add_timer(&executor, &odom_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_imu_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_gps_timer);
 
@@ -531,10 +630,8 @@ void task_ros2_function(void *argument)
 	  rclc_executor_spin(&executor);
 
 	  /* Infinite loop */
-	  for(;;)
-	  {
-	    osDelay(10);
-	  }
+	  for(;;) osDelay(10);
+
   /* USER CODE END task_ros2_function */
 }
 
@@ -552,15 +649,16 @@ void digital_inputs_task(void *argument)
 	 uint8_t stats[3]={0,0,0};
 	  for(;;){
 
-		  // key switch
+		  // key switch read
 		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6));
 		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));
 		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));
 
-		  // break
+		  // break read
 		  digital_data_input_manual[4]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13));
-		  // throttle
+		  // throttle read
 		  digital_data_input_manual[3]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12));
+
 
 		  if(stats[0] || stats[1] || stats[2]){
 			  if(stats[0])
@@ -571,9 +669,10 @@ void digital_inputs_task(void *argument)
 			    digital_data_input_manual[1]=4;
 		  }else
 			  digital_data_input_manual[1]=1;
-        //steer
+
+        //steer read
 	    HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &rxHeader, canRX);
-	    raw=canRX[7];
+	    steer_info=canRX[7];
 
 		  osDelay(100);
 	  }
@@ -638,32 +737,28 @@ void automatic_manual_mode_Task(void *argument)
 
 	  switch(flg){
 
-	  case 0:
-      //KEY SWITCH
-		  if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
-		     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
-         else
-		     if(digital_data_input_manual[1]==2)
-            	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);
+	     case 0:
+     //KEY SWITCH
+	    	  if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
+		         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
+             else
+		         if(digital_data_input_manual[1]==2)
+                     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);
+
+     	      if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==4)
+     	         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
+     	      else
+                 if(digital_data_input_manual[1]==3)
+            	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);
+
+    	     if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==3)
+    		     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
+    	     else
+                 if(digital_data_input_manual[1]==4)
+            	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
 
 
-
-     	 if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==4)
-     		 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
-     	 else
-             if(digital_data_input_manual[1]==3)
-            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);
-
-    	 if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==3)
-    		 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
-    	 else
-             if(digital_data_input_manual[1]==4)
-            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
-
-
-
-      // THROTTLE
-
+     //THROTTLE
 
              if(digital_data_input_manual[3]){
             	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_SET);
@@ -671,7 +766,7 @@ void automatic_manual_mode_Task(void *argument)
                }else
             	 if(!digital_data_input_manual[3])
             		 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_RESET);
-      //  BREAK
+     //BREAK
              if(digital_data_input_manual[4]){
                	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_SET);
                  HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_manual[3]);
@@ -682,33 +777,34 @@ void automatic_manual_mode_Task(void *argument)
 		  break;
 
 	  case 1:
-		    //KEY SWITCH
-     	 if(digital_data_input_auto[1]==1 || digital_data_input_auto[1]==3 || digital_data_input_auto[1]==4)
-     		 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
-  	      else
-	        if(digital_data_input_auto[1]==2)
-	          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);
 
-    	 if(digital_data_input_auto[1]==1 || digital_data_input_auto[1]==2 || digital_data_input_auto[1]==4)
-    		 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
-    	 else
-		    if(digital_data_input_auto[1]==3)
-		       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);
+      //KEY SWITCH
+	    	  if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
+		         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
+             else
+		         if(digital_data_input_manual[1]==2)
+                     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);
 
-      	 if(digital_data_input_auto[1]==1 || digital_data_input_auto[1]==2 || digital_data_input_auto[1]==3)
-	          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
-      	 else
-	 	    if(digital_data_input_auto[1]==4)
-	       	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
+     	      if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==4)
+     	         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
+     	      else
+                 if(digital_data_input_manual[1]==3)
+            	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);
 
-		      // THROTTLE
+    	     if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==3)
+    		     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
+    	     else
+                 if(digital_data_input_manual[1]==4)
+            	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
+
+	  // THROTTLE
 		             if(digital_data_input_auto[3]){
 		            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_SET);
 		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, analog_data_input_auto[2]);
 	  	  	  	  	  }else
 		            	 if(!digital_data_input_auto[3])
 		                	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_RESET);
-            //  BREAK
+      //BREAK
 		             if(digital_data_input_auto[4]){
 		            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_SET);
 		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_auto[3]);
@@ -719,11 +815,70 @@ void automatic_manual_mode_Task(void *argument)
 	     break;
 
 	  }
-
-
-    osDelay(100);
+     osDelay(100);
   }
   /* USER CODE END automatic_manual_mode_Task */
+}
+
+/* USER CODE BEGIN Header_task_stepper_function */
+/**
+* @brief Function implementing the task_stepper thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_task_stepper_function */
+void task_stepper_function(void *argument)
+{
+  /* USER CODE BEGIN task_stepper_function */
+	uint32_t flags;
+	stepperInit(&stepper);
+
+	stepperSetSpeed(&stepper, 1);
+	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	stepperSetAcceleration(&stepper, 48*2*4);
+	// Motor = 7.5°/Step, 1/4 Microstepping, speed =  2rev/s,
+	stepperSetMaxSpeed(&stepper, 2*4*48);
+	stepperSetAbsoluteTartePosition(&stepper, 0);
+	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	 HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
+
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  flags = osThreadFlagsWait((TF_STEPPER_INT | TF_STEPPER_DATA), osFlagsWaitAny, osWaitForever);
+
+	  if ((flags & TF_STEPPER_INT) == TF_STEPPER_INT){
+		  stepperComputeNewSpeed(&stepper);
+		     change_period();
+		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	  }
+
+	  if ((flags & TF_STEPPER_DATA) == TF_STEPPER_DATA){
+		  stepperComputeNewSpeed(&stepper);
+		   change_period();
+		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	  }
+  }
+  /* USER CODE END task_stepper_function */
+}
+
+/* USER CODE BEGIN Header_Imu_gps_steer_function */
+/**
+* @brief Function implementing the Imu_gps_steer thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Imu_gps_steer_function */
+void Imu_gps_steer_function(void *argument)
+{
+  /* USER CODE BEGIN Imu_gps_steer_function */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Imu_gps_steer_function */
 }
 
 /* Private application code --------------------------------------------------*/
@@ -731,91 +886,105 @@ void automatic_manual_mode_Task(void *argument)
 
 /* ROS CALLBACKS*/
 void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call_time) // Envia os dados de estados do carrihno para o ros2
-{
-	if(flg){ // status dos dois modods de operação
-     	        golfinho_check_status_msg.data.data[0]=digital_data_input_auto[0];
-	         	golfinho_check_status_msg.data.data[1]=digital_data_input_auto[1]; // key_switch
-			    golfinho_check_status_msg.data.data[2]=digital_data_input_auto[2]; // op_mode
-			    golfinho_check_status_msg.data.data[3]=digital_data_input_auto[3]; // key_t
-				golfinho_check_status_msg.data.data[4]=digital_data_input_auto[4]; // key_break
+{               // status dos dois modos de operação
+	if(flg){
+				golfinho_check_status_msg.data.data[0]=digital_data_input_manual[0];
+				golfinho_check_status_msg.data.data[1]=digital_data_input_manual[1];//key_switch
+			    golfinho_check_status_msg.data.data[2]=digital_data_input_auto[2];  //op_mode
+			    golfinho_check_status_msg.data.data[3]=digital_data_input_auto[3];  //key_throttle
+				golfinho_check_status_msg.data.data[4]=digital_data_input_auto[4];  //key_break
 			}else {
 				golfinho_check_status_msg.data.data[0]=digital_data_input_manual[0];
-				golfinho_check_status_msg.data.data[1]=digital_data_input_manual[1];// key_switch
-			    golfinho_check_status_msg.data.data[2]=digital_data_input_auto[2];  // op_mode
-			    golfinho_check_status_msg.data.data[3]=digital_data_input_manual[3];// key_t
-			    golfinho_check_status_msg.data.data[4]=digital_data_input_manual[4];// key_break
-   	         }
-
+				golfinho_check_status_msg.data.data[1]=digital_data_input_manual[1]; // key_switch
+			    golfinho_check_status_msg.data.data[2]=digital_data_input_auto[2];   //op_mode
+			    golfinho_check_status_msg.data.data[3]=digital_data_input_manual[3]; //key_throttle
+			    golfinho_check_status_msg.data.data[4]=digital_data_input_manual[4]; //key_break
+    }
 		// Publish the message
 		rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub,&golfinho_check_status_msg, NULL);
-		if (ret != RCL_RET_OK)
-		{
+		if (ret != RCL_RET_OK){
 		  printf("Error publishing gpio inputs (line %d)\n", __LINE__);
 		}
 }
+
+
 
 void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {
 	if(flg){ // status dos dois modos de operação
-		   golfinho_motion_info_gpio_output_msg.data.data[1]=raw;
 
-		if(digital_data_input_auto[3]) //acelerador
-		   golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_auto[2]*100/4096;
-		else
-		   golfinho_motion_info_gpio_output_msg.data.data[2]=0;
+		       golfinho_motion_info_gpio_output_msg.data.data[1]=steer_info; // steer
 
-		if(digital_data_input_auto[4]) //break
-	    	golfinho_motion_info_gpio_output_msg.data.data[3]=analog_data_input_auto[3]*100/4096;
-		else
-	    	golfinho_motion_info_gpio_output_msg.data.data[3]=0;
+		      if(digital_data_input_auto[3]) //acelerador
+		         golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_auto[2]*100/4096;
+		      else
+		         golfinho_motion_info_gpio_output_msg.data.data[2]=0;
 
-		golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
-		golfinho_motion_info_gpio_output_msg.data.data[5]=analog_data_input_manual[5]*100/4096; // batery system
-			}else {
+		      if(digital_data_input_auto[4]) //break
+                 golfinho_motion_info_gpio_output_msg.data.data[3]=analog_data_input_auto[3]*100/4096;
+	    	  else
+	        	 golfinho_motion_info_gpio_output_msg.data.data[3]=0;
 
-				   golfinho_motion_info_gpio_output_msg.data.data[1]=raw;
+	        	golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
+	         	golfinho_motion_info_gpio_output_msg.data.data[5]=analog_data_input_manual[5]*100/4096; // batery system
 
-				if(digital_data_input_manual[3]) //acelerador
-			        golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_manual[2]*100/4096;
-				else
-			        golfinho_motion_info_gpio_output_msg.data.data[2]=0;
+			   }else {
 
-			    if(digital_data_input_manual[4]) //freio
-			    	golfinho_motion_info_gpio_output_msg.data.data[3]=analog_data_input_manual[3]*100/4096;
-			    else
-			    	golfinho_motion_info_gpio_output_msg.data.data[3]=0;
+				       golfinho_motion_info_gpio_output_msg.data.data[1]=steer_info; // steer
 
-				golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
-				golfinho_motion_info_gpio_output_msg.data.data[5]=analog_data_input_manual[5]*100/4096; // batery system
-   	         }
+                       if(digital_data_input_manual[3]) //acelerador
+			             golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_manual[2]*100/4096;
+				       else
+			             golfinho_motion_info_gpio_output_msg.data.data[2]=0;
 
+			           if(digital_data_input_manual[4]) //freio
+			    	     golfinho_motion_info_gpio_output_msg.data.data[3]=analog_data_input_manual[3]*100/4096;
+			           else
+			    	     golfinho_motion_info_gpio_output_msg.data.data[3]=0;
+
+			        	golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
+				        golfinho_motion_info_gpio_output_msg.data.data[5]=analog_data_input_manual[5]*100/4096; // batery system
+   	}
 		// Publish the message
 		rcl_ret_t ret = rcl_publish(&ros2_motion_info_pub,&golfinho_motion_info_gpio_output_msg, NULL);
-		if (ret != RCL_RET_OK)
-		{
+		if (ret != RCL_RET_OK){
 		  printf("Error publishing gpio inputs (line %d)\n", __LINE__);
 		}
 }
 
-void receive_commands_from_ros_callback(const void * msgin){
+void cmd_vel_callback(const void * msgin){
 
-
-	const std_msgs__msg__UInt16MultiArray *receive_command_ros_msg;
+	const geometry_msgs__msg__Twist *cmd_vel_msg;
 
 	if (msgin != NULL){
-		receive_command_ros_msg = (const std_msgs__msg__UInt16MultiArray *)msgin;
+		 cmd_vel_msg = (const geometry_msgs__msg__Twist *)msgin;
+         cmd_vel_buff[0]=cmd_vel_msg->linear.x;  // velocidade linear
+         cmd_vel_buff[1]=cmd_vel_msg->angular.z; // posição angular
+         stepper.targetPos=cmd_vel_buff[1];
+		  osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
+/*
+		 digital_data_input_auto[1]= receive_command_ros_msg->data.data[0]; // key_switch
+		 digital_data_input_auto[2]= receive_command_ros_msg->data.data[1]; // operation_modo
+	     flg=digital_data_input_auto[2];
+		 digital_data_input_auto[3]= receive_command_ros_msg->data.data[2];  // throttle_ switch
+	     digital_data_input_auto[4]= receive_command_ros_msg->data.data[3];  // break_ switch
 
-		digital_data_input_auto[1]= receive_command_ros_msg->data.data[0]; // key_switch
-		digital_data_input_auto[2]= receive_command_ros_msg->data.data[1]; // operation_modo
-		flg=digital_data_input_auto[2];
-		digital_data_input_auto[3]= receive_command_ros_msg->data.data[2];  // throttle_ switch
-		digital_data_input_auto[4]= receive_command_ros_msg->data.data[3];  // break_ switch
-
-		analog_data_input_auto[2]= receive_command_ros_msg->data.data[4]; // throttle analog
-		analog_data_input_auto[3]= receive_command_ros_msg->data.data[5]; // break analog
-
+     	 analog_data_input_auto[2]= receive_command_ros_msg->data.data[4]; // throttle analog
+	     analog_data_input_auto[3]= receive_command_ros_msg->data.data[5]; // break analog
+*/
 	}
 }
+
+
+void operation_mode_callback(const void * msgin){
+	const std_msgs__msg__UInt8 *operation_mode_msg;
+	if (msgin != NULL){
+		operation_mode_msg = (const std_msgs__msg__UInt8 *)msgin;
+         flg=operation_mode_msg->data;  // flag - operation mode , go to automatic_manual_mode
+		 digital_data_input_auto[2]=flg;    // go to check_status
+	}
+}
+
 
 void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {
@@ -841,7 +1010,7 @@ void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 		{
 		  printf("Error publishing gpio inputs (line %d)\n", __LINE__);
 		}
-}
+    }
 }
 
 
@@ -873,6 +1042,32 @@ void golfinho_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
    }
 }
 
+void odom_callback(rcl_timer_t * timer, int64_t last_call_time)
+{
+	int device_id=4321;
+	int seq_no=15;
+
+	(void) last_call_time;
+
+	if (timer != NULL) {
+
+		sprintf(odom.header.frame_id.data, "%d_%d", seq_no, device_id);
+		odom.header.frame_id.size = strlen(odom.header.frame_id.data);
+
+		// Fill the message timestamp
+		struct timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts);
+		odom.header.stamp.sec = ts.tv_sec;
+		odom.header.stamp.nanosec = ts.tv_nsec;
+
+		rcl_ret_t ret = rcl_publish(&odom_pub,&odom, NULL);
+
+		if (ret != RCL_RET_OK)
+		{
+		  printf("Error publishing gpio inputs (line %d)\n", __LINE__);
+		}
+   }
+}
 
 
 void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
@@ -969,4 +1164,84 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
     Error_Handler();
   }
 }
+
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+
+  if (htim->Instance == TIM2) {
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+	   for(int i=0;i<999;i++);
+	   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+    HAL_IncTick();
+  }
+
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
+
+
+void change_period(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 36000;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = stepper.stepInverval;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
+	if (htim->Instance == TIM3){
+		if (stepper.direction == DIRECTION_CW) {
+			stepper.currentPos++;
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+		} else {
+			stepper.currentPos--;
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+		}
+		osThreadFlagsSet(task_stepperHandle, TF_STEPPER_INT);
+
+	}
+}
+
 /* USER CODE END Application */
+
+
