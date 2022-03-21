@@ -15,8 +15,9 @@ void stepperInit(stepper_t* stepper){
 	stepper->cn = 0.0;
 	stepper->cmin = 1.0;
 	//HAL_GPIO_WritePin(STEPPER_EN_GPIO_Port, STEPPER_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 }
 
 void stepperSetSpeed(stepper_t* stepper, float speed){

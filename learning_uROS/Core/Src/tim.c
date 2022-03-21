@@ -46,7 +46,7 @@ void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 3600;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 100;
+  htim2.Init.Period = 65000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -216,6 +216,10 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE END TIM4_MspInit 0 */
     /* TIM4 clock enable */
     __HAL_RCC_TIM4_CLK_ENABLE();
+
+    /* TIM4 interrupt Init */
+    HAL_NVIC_SetPriority(TIM4_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(TIM4_IRQn);
   /* USER CODE BEGIN TIM4_MspInit 1 */
 
   /* USER CODE END TIM4_MspInit 1 */
@@ -287,6 +291,9 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE END TIM4_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM4_CLK_DISABLE();
+
+    /* TIM4 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(TIM4_IRQn);
   /* USER CODE BEGIN TIM4_MspDeInit 1 */
 
   /* USER CODE END TIM4_MspDeInit 1 */

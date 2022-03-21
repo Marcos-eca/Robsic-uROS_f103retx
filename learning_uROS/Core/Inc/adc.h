@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    adc.c
-  * @brief   This file provides code for the configuration
-  *          of the ADC instances.
+  * @file    adc.h
+  * @brief   This file contains all the function prototypes for
+  *          the adc.c file
   ******************************************************************************
   * @attention
   *
