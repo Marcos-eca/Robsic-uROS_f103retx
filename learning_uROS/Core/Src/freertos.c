@@ -63,6 +63,8 @@
 #include <std_msgs/msg/float32.h>
 #include <nav_msgs/msg/odometry.h>
 
+#include <sensor_msgs/msg/joint_state.h>
+
 #include <geometry_msgs/msg/twist.h>
 
 /* USER CODE END Includes */
@@ -259,6 +261,7 @@ void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call
 void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 
 void odom_callback(rcl_timer_t * timer, int64_t last_call_time);
 
@@ -469,6 +472,13 @@ void task_ros2_function(void *argument)
 			  ROSIDL_GET_MSG_TYPE_SUPPORT(nav_msgs, msg, Odometry),
 			  "/golfinho/odom");
 
+	  // ros2_joint_steering_pub
+	  rclc_publisher_init_default(
+			  &ros2_joint_steering_pub,
+			  &node,
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
+			  "/golfinho/joint_steering");
+
 	  //create cmd_vel_sub
 	  cmd_vel_sub = rcl_get_zero_initialized_subscription();
       rclc_subscription_init_best_effort(
@@ -548,16 +558,48 @@ void task_ros2_function(void *argument)
 				    	odom.child_frame_id.capacity=15;
 
 
+				    	// joint_steering
+
+				    				    	char joint_steering_buffer[STRING_BUFFER_LEN];
+				    				    	joint_steering.header.frame_id.data = joint_steering_buffer;
+				    				    	joint_steering.header.frame_id.capacity = STRING_BUFFER_LEN;
+
+				    				    	joint_steering.name.capacity=1;
+				    						joint_steering.name.size=1;
+				    						joint_steering.name.data=(rosidl_runtime_c__String *) pvPortMalloc(joint_steering.name.capacity * sizeof(rosidl_runtime_c__String));
+
+				    						joint_steering.name.data->capacity=5;
+				    						joint_steering.name.data->size=5;
+				    						joint_steering.name.data->data=(char*) pvPortMalloc(joint_steering.name.capacity * sizeof(char));
+				    					 	strcpy(joint_steering.name.data->data, "steer");
+
+				    					 	joint_steering.velocity.capacity=1;
+				    					 	joint_steering.velocity.size=1;
+				    					 	joint_steering.velocity.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
+
+				    					 	joint_steering.position.capacity=1;
+				    					 	joint_steering.position.size=1;
+				    					 	joint_steering.position.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
+
+				    					 	joint_steering.effort.capacity=1;
+				    					 	joint_steering.effort.size=1;
+				    					 	joint_steering.effort.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
+
+
+
+
+
 
 	  // Create a timer
 	  rclc_timer_init_default(&golfinho_imu_timer, &support, RCL_MS_TO_NS(100), golfinho_imu_timer_callback);
 	  rclc_timer_init_default(&odom_timer, &support, RCL_MS_TO_NS(100), odom_callback);
+	  rclc_timer_init_default(&golfinho_joint_steering_timer, &support, RCL_MS_TO_NS(100), golfinho_joint_steering_timer_callback);
 	  rclc_timer_init_default(&golfinho_motion_info_timer, &support, RCL_MS_TO_NS(250), golfinho_motion_info_timer_callback);
 	  rclc_timer_init_default(&golfinho_check_status_timer, &support, RCL_MS_TO_NS(500), golfinho_check_status_timer_callback);
 	  rclc_timer_init_default(&golfinho_gps_timer, &support, RCL_MS_TO_NS(1000), golfinho_gps_timer_callback);
 
 	  // Create executor
-	  rclc_executor_init(&executor, &support.context,7, &allocator);
+	  rclc_executor_init(&executor, &support.context,8, &allocator);
 
 //	  rclc_executor_add_subscription(&executor, &cmd_vel_sub, &cmd_vel,
 //	 	  			  &cmd_vel_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
@@ -565,6 +607,7 @@ void task_ros2_function(void *argument)
 //	 	  			  &operation_mode_callback, ON_NEW_DATA);
 
 	  rclc_executor_add_timer(&executor, &odom_timer);
+	  rclc_executor_add_timer(&executor, &golfinho_joint_steering_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_check_status_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_motion_info_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_imu_timer);
@@ -965,6 +1008,41 @@ void odom_callback(rcl_timer_t * timer, int64_t last_call_time)
 		}
    }
 }
+
+
+void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+{
+	int device_id=012;
+	int seq_no=01;
+	double data0=90;
+
+	(void) last_call_time;
+
+	if (timer != NULL) {
+
+		sprintf(joint_steering.header.frame_id.data, "%d_%d", seq_no, device_id);
+		joint_steering.header.frame_id.size = strlen(joint_steering.header.frame_id.data);
+
+		// Fill the message timestamp
+		struct timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts);
+		joint_steering.header.stamp.sec = ts.tv_sec;
+		joint_steering.header.stamp.nanosec = ts.tv_nsec;
+
+		joint_steering.position.data=&data0;
+		joint_steering.velocity.data=&data0;
+		joint_steering.effort.data=&data0;
+
+		rcl_ret_t ret = rcl_publish(&ros2_joint_steering_pub,&joint_steering, NULL);
+
+		if (ret != RCL_RET_OK)
+		{
+		  printf("Error publishing gpio inputs (line %d)\n", __LINE__);
+		}
+	}
+
+}
+
 
 
 void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call_time) // Envia os dados de estados do carrihno para o ros2
