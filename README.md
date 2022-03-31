@@ -4,4 +4,4 @@
 
 ![Descrição do código](block_code_description_.jpeg)
 
-- A cor em vermelho destaca o que falta para implementar no código.
+- A cor em vermelho destaca o que falta implementar no código.
