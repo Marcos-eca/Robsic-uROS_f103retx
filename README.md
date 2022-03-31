@@ -7,4 +7,4 @@
 </p>
 
 
-- O que falta implementar no código é destacado em vermelho .
+- É destacado em vermelho o que falta implementar no código.
