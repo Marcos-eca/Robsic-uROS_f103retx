@@ -304,7 +304,9 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-      HAL_TIM_Base_Start_IT(&htim2);
+	HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+	HAL_TIM_Base_Start_IT(&htim2);
    // CAN configuration transmiter
 	  txHeader.DLC = 8;
 	  txHeader.IDE = CAN_ID_STD; //CAN_ID_EXT
@@ -625,9 +627,9 @@ void digital_inputs_task(void *argument)
 	  for(;;){
 
 		  // key switch read
-		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6));
-		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));
-		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));
+		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6));    //d
+		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));   //c
+		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a
 
 		  // break read
 		  digital_data_input_manual[4]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13));
@@ -637,11 +639,11 @@ void digital_inputs_task(void *argument)
 
 		  if(stats[0] || stats[1] || stats[2]){
 			  if(stats[0])
-			 	digital_data_input_manual[1]=2;
+			 	digital_data_input_manual[1]=2; //a
 			  if(stats[1])
-			 	digital_data_input_manual[1]=3;
+			 	digital_data_input_manual[1]=3; //c
 			  if(stats[2])
-			    digital_data_input_manual[1]=4;
+			    digital_data_input_manual[1]=4; //d
 		  }else
 			  digital_data_input_manual[1]=1;
 
@@ -674,7 +676,7 @@ void analog_input_task(void *argument)
 		  analog_data_input_manual[3] = HAL_ADC_GetValue(&hadc1);
 		  HAL_ADC_Stop(&hadc1);
 
-	          ADC_select_channel_break();
+	      ADC_select_channel_break();
 		  HAL_ADC_Start(&hadc1);
 		  HAL_ADC_PollForConversion(&hadc1, 10);
 		  analog_data_input_manual[2] = HAL_ADC_GetValue(&hadc1);
@@ -713,23 +715,26 @@ void automatic_manual_mode_Task(void *argument){
 
 	     case 0:
      //KEY SWITCH
+
 	    	       if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
-		          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
+		          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
                         else
-		         if(digital_data_input_manual[1]==2)
-                            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);
+		         if(digital_data_input_manual[1]==2) //a
+                            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);  //a
 
      	               if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==4)
      	                   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
      	                 else
-                          if(digital_data_input_manual[1]==3)
-            	             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);
+                          if(digital_data_input_manual[1]==3) //c
+            	             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET); //c
 
     	                if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==3)
     		            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
     	                  else
-                           if(digital_data_input_manual[1]==4)
-            	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
+                           if(digital_data_input_manual[1]==4) //d
+            	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET); //d
+
+
 
      //THROTTLE
 
@@ -752,7 +757,8 @@ void automatic_manual_mode_Task(void *argument){
 	  case 1:
 
       //KEY SWITCH
-	    	          if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
+
+	    	         if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
 		              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
                              else
 		              if(digital_data_input_manual[1]==2)
@@ -769,7 +775,13 @@ void automatic_manual_mode_Task(void *argument){
     	                     else
                                  if(digital_data_input_manual[1]==4)
             	                    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
-	  // THROTTLE  
+
+
+
+
+
+
+    	   // THROTTLE
 		             if(digital_data_input_auto[3]){
 		            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_SET);
 		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, analog_data_input_auto[2]);
@@ -781,8 +793,10 @@ void automatic_manual_mode_Task(void *argument){
 		            	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_SET);
 		                  HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_auto[3]);
 	  	  	        }else
-	  	  	  	    if(!digital_data_input_auto[4])
+	  	  	  	          if(!digital_data_input_auto[4])
 		                       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
+
+
 	     break;
 
 	  }
@@ -1038,7 +1052,7 @@ void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_
 {
 	if(flg){ // status dos dois modos de operação
 	              golfinho_motion_info_gpio_output_msg.data.data[1]=steer_info; // steer
-		
+
 		      if(digital_data_input_auto[3]) //acelerador
 		         golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_auto[2]*100/4096;
 		      else
@@ -1055,7 +1069,7 @@ void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_
 			 }else{
 
 				 golfinho_motion_info_gpio_output_msg.data.data[1]=steer_info; // steer
-		
+
                                  if(digital_data_input_manual[3]) //acelerador
 			             golfinho_motion_info_gpio_output_msg.data.data[2]=analog_data_input_manual[2]*100/4096;
 				 else
