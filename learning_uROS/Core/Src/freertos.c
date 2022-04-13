@@ -717,7 +717,7 @@ void automatic_manual_mode_Task(void *argument){
      //KEY SWITCH
 
 	    	       if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
-		          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
+		          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
                         else
 		         if(digital_data_input_manual[1]==2) //a
                             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);  //a
