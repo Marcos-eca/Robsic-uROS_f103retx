@@ -238,13 +238,6 @@ const osThreadAttr_t task_stepper_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for Imu_gps_steer */
-osThreadId_t Imu_gps_steerHandle;
-const osThreadAttr_t Imu_gps_steer_attributes = {
-  .name = "Imu_gps_steer",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -293,7 +286,6 @@ void digital_inputs_task(void *argument);
 void analog_input_task(void *argument);
 void automatic_manual_mode_Task(void *argument);
 void task_stepper_function(void *argument);
-void Imu_gps_steer_function(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -367,9 +359,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of task_stepper */
   task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
-
-  /* creation of Imu_gps_steer */
-  Imu_gps_steerHandle = osThreadNew(Imu_gps_steer_function, NULL, &Imu_gps_steer_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -581,9 +570,9 @@ void task_ros2_function(void *argument)
 
 
 	  // Create a timer
-	  rclc_timer_init_default(&golfinho_imu_timer, &support, RCL_MS_TO_NS(100), golfinho_imu_timer_callback);
-	  rclc_timer_init_default(&odom_timer, &support, RCL_MS_TO_NS(100), odom_callback);
-	  rclc_timer_init_default(&golfinho_joint_steering_timer, &support, RCL_MS_TO_NS(100), golfinho_joint_steering_timer_callback);
+	  rclc_timer_init_default(&golfinho_imu_timer, &support, RCL_MS_TO_NS(40), golfinho_imu_timer_callback);
+	  rclc_timer_init_default(&odom_timer, &support, RCL_MS_TO_NS(40), odom_callback);
+	  rclc_timer_init_default(&golfinho_joint_steering_timer, &support, RCL_MS_TO_NS(40), golfinho_joint_steering_timer_callback);
 	  rclc_timer_init_default(&golfinho_motion_info_timer, &support, RCL_MS_TO_NS(250), golfinho_motion_info_timer_callback);
 	  rclc_timer_init_default(&golfinho_check_status_timer, &support, RCL_MS_TO_NS(500), golfinho_check_status_timer_callback);
 	  rclc_timer_init_default(&golfinho_gps_timer, &support, RCL_MS_TO_NS(1000), golfinho_gps_timer_callback);
@@ -598,9 +587,9 @@ void task_ros2_function(void *argument)
 
 	  rclc_executor_add_timer(&executor, &odom_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_joint_steering_timer);
+	  rclc_executor_add_timer(&executor, &golfinho_imu_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_check_status_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_motion_info_timer);
-	  rclc_executor_add_timer(&executor, &golfinho_imu_timer);
 	  rclc_executor_add_timer(&executor, &golfinho_gps_timer);
 
       // Run executor
@@ -627,8 +616,8 @@ void digital_inputs_task(void *argument)
 	  for(;;){
 
 		  // key switch read
-		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6));    //d
-		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));   //c
+		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7));    //d (antes pc6)  agora entrada do buzzer pc7 num 46
+		  stats[1]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9));   //c (antes pb15)  agora entrada do buzzer pc9 num 19
 		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a
 
 		  // break read
@@ -852,16 +841,6 @@ void task_stepper_function(void *argument)
 * @retval None
 */
 /* USER CODE END Header_Imu_gps_steer_function */
-void Imu_gps_steer_function(void *argument)
-{
-  /* USER CODE BEGIN Imu_gps_steer_function */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END Imu_gps_steer_function */
-}
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
