@@ -608,17 +608,19 @@ void task_ros2_function(void *argument)
 * @retval None
 */
 /* USER CODE END Header_digital_inputs_task */
+uint8_t stats[3]={0,0,0};
+
 void digital_inputs_task(void *argument)
 {
   /* USER CODE BEGIN digital_inputs_task */
   /* Infinite loop */
-	 uint8_t stats[3]={0,0,0};
+	// uint8_t stats[3]={0,0,0};
 	  for(;;){
 
 		  // key switch read
-		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7));    //d (antes pc6)  agora entrada do buzzer pc7 num 46
-		  stats[1]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9));   //c (antes pb15)  agora entrada do buzzer pc9 num 19
-		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a
+		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a                                                  -- BRANCO
+		  stats[1]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9));   //c (antes pb15)  agora entrada do buzzer pc9 num 19  -- VERDE
+		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7));    //d (antes pc6)  agora entrada do buzzer pc7 num 46  -- VERMELHO
 
 		  // break read
 		  digital_data_input_manual[4]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13));
@@ -626,15 +628,20 @@ void digital_inputs_task(void *argument)
 		  digital_data_input_manual[3]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12));
 
 
+
+
 		  if(stats[0] || stats[1] || stats[2]){
-			  if(stats[0])
+			  if(stats[1] && stats[2])  //Frente
 			 	digital_data_input_manual[1]=2; //a
-			  if(stats[1])
+			  if(stats[0] && stats[2])  // Ré
 			 	digital_data_input_manual[1]=3; //c
-			  if(stats[2])
+			  if(stats[2] && !stats[1] && !stats[0])  // Neutro
 			    digital_data_input_manual[1]=4; //d
 		  }else
 			  digital_data_input_manual[1]=1;
+
+
+
 
         //steer read - temporario : para fins de teste de leitura de dados da rede can.
 	  if(flg_ImuGps_Sterr)
@@ -703,28 +710,38 @@ void automatic_manual_mode_Task(void *argument){
 	  switch(flg){
 
 	     case 0:
-     //KEY SWITCH
+//KEY SWITCH
+	    	 switch(digital_data_input_manual[1]){
 
-	    	       if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
-		          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
-                        else
-		         if(digital_data_input_manual[1]==2) //a
-                            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);  //a
+	    	 case 1:
 
-     	               if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==4)
-     	                   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
-     	                 else
-                          if(digital_data_input_manual[1]==3) //c
-            	             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET); //c
+	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET); //c -- VERDE
+	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET); //d -- VERMELHO
+		     break;
+	//FRENTE
+	    	 case 2:
 
-    	                if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==3)
-    		            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
-    	                  else
-                           if(digital_data_input_manual[1]==4) //d
-            	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET); //d
+   	    	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+ 	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);   //c -- VERDE
+	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);   //d -- VERMELHO
+             break;
+	// RÉ
+	    	 case 3:
+                      //c
+			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+			         	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
+			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
+                    break;
+	// NEUTRO
+	    	 case 4:
+                     //D
+                      	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+                       	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
+                         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
+             break;
 
-
-
+	    	 }
      //THROTTLE
 
                          if(digital_data_input_manual[3]){
@@ -745,30 +762,38 @@ void automatic_manual_mode_Task(void *argument){
 
 	  case 1:
 
-      //KEY SWITCH
+		  //KEY SWITCH
+		  	    	 switch(digital_data_input_manual[1]){
+		  	//FRENTE
+		  	    	 case 1:
 
-	    	         if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==3 || digital_data_input_manual[1]==4)
-		              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);
-                             else
-		              if(digital_data_input_manual[1]==2)
-                                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET); //c -- VERDE
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET); //d -- VERMELHO
+		  		     break;
 
-     	                   if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==4)
-     	                       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);
-     	                     else
-                                if(digital_data_input_manual[1]==3)
-            	                  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);
+		  	    	 case 2:
 
-    	                    if(digital_data_input_manual[1]==1 || digital_data_input_manual[1]==2 || digital_data_input_manual[1]==3)
-    	                        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET);
-    	                     else
-                                 if(digital_data_input_manual[1]==4)
-            	                    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);
+		     	    	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+		   	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);   //c -- VERDE
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);   //d -- VERMELHO
+		               break;
+		  	// RÉ
+		  	    	 case 3:
+		                        //c
+		  			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+		  			         	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
+		  			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
+		                      break;
+		  	// NEUTRO
+		  	    	 case 4:
+		                       //D
+		                        	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+		                         	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
+		                           HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
+		               break;
 
-
-
-
-
+		  	    	 }
 
     	   // THROTTLE
 		             if(digital_data_input_auto[3]){
@@ -784,7 +809,6 @@ void automatic_manual_mode_Task(void *argument){
 	  	  	        }else
 	  	  	  	          if(!digital_data_input_auto[4])
 		                       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
-
 
 	     break;
 
