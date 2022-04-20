@@ -619,7 +619,7 @@ void digital_inputs_task(void *argument)
 
 		  // key switch read
 		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a                                                  -- BRANCO
-		  stats[1]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9));   //c (antes pb15)  agora entrada do buzzer pc9 num 19  -- VERDE
+		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));   //c (antes pb15)  								  -- VERDE
 		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7));    //d (antes pc6)  agora entrada do buzzer pc7 num 46  -- VERMELHO
 
 		  // break read
@@ -736,7 +736,7 @@ void automatic_manual_mode_Task(void *argument){
 	// NEUTRO
 	    	 case 4:
                      //D
-                      	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+                      	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);     //a -- BRANCO
                        	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
                          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
              break;
@@ -774,7 +774,7 @@ void automatic_manual_mode_Task(void *argument){
 
 		  	    	 case 2:
 
-		     	    	      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+		     	    	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
 		   	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);   //c -- VERDE
 		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);   //d -- VERMELHO
 		               break;
@@ -788,7 +788,7 @@ void automatic_manual_mode_Task(void *argument){
 		  	// NEUTRO
 		  	    	 case 4:
 		                       //D
-		                        	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+		                        	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);     //a -- BRANCO
 		                         	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
 		                           HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
 		               break;
