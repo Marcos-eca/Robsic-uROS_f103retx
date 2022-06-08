@@ -73,6 +73,36 @@
 typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
+int32_t count_a=0,count_pulse_a=0; //DIREITO
+int32_t count_b=0,count_pulse_b=0; //ESQUERDO
+uint32_t Nmax_rev=3600;
+float angle_resolution=0.05;
+float Ts=0.02;
+float vel[4]={0,0,0,0};
+
+uint16_t info_interrupt;
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+
+	info_interrupt = GPIO_Pin;
+
+   if(GPIO_Pin == GPIO_PIN_0){
+	   if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1))
+	   { count_a++; count_pulse_a++;}
+	   else
+		  {count_a--; count_pulse_a--;}
+
+   }
+
+   if(GPIO_Pin == GPIO_PIN_8){
+	 if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9))
+          {count_b--; count_pulse_b--;}
+	   else
+ 		  {count_b++; count_pulse_b++;}
+ }
+
+}
+
 HAL_StatusTypeDef status;
 
 /* USER CODE END PTD */
@@ -137,9 +167,9 @@ nav_msgs__msg__Odometry odom;
 uint8_t flg=0; //modo de operação do golfinho manual-0 ; auto-1;
 uint8_t flg_ImuGps_Sterr=0; //informa qual topico enviou os dados para a placa principal: CAN IMU_GPS - 0 , STEER - 1;
 uint8_t digital_data_input_manual[5]={0,0,0,0,0};
-uint16_t analog_data_input_manual[5]={0,0,0,0,0};
+uint16_t analog_data_input_manual[6]={0,0,0,0,0,0};
 uint8_t digital_data_input_auto[5]={0,0,0,0,0};
-uint16_t analog_data_input_auto[5]={0,0,0,0,0};
+uint16_t analog_data_input_auto[6]={0,0,0,0,0,0};
 
 double cmd_vel_buff[2]={0,0}; // buffer
 
@@ -278,7 +308,6 @@ void ADC_select_channel_system_batery(void);
 uint32_t stepper_interval=65000;
 void signal_pos_stepper(uint32_t);
 void change_period(void);
-
 /* USER CODE END FunctionPrototypes */
 
 void task_ros2_function(void *argument);
@@ -299,6 +328,9 @@ void MX_FREERTOS_Init(void) {
 	HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
 	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
 	HAL_TIM_Base_Start_IT(&htim2);
+
+    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+
    // CAN configuration transmiter
 	  txHeader.DLC = 8;
 	  txHeader.IDE = CAN_ID_STD; //CAN_ID_EXT
@@ -346,7 +378,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* creation of task_ros2 */
-  task_ros2Handle = osThreadNew(task_ros2_function, NULL, &task_ros2_attributes);
+  //task_ros2Handle = osThreadNew(task_ros2_function, NULL, &task_ros2_attributes);
 
   /* creation of digital_inputs */
   digital_inputsHandle = osThreadNew(digital_inputs_task, NULL, &digital_inputs_attributes);
@@ -358,7 +390,7 @@ void MX_FREERTOS_Init(void) {
   auto_man_modHandle = osThreadNew(automatic_manual_mode_Task, NULL, &auto_man_mod_attributes);
 
   /* creation of task_stepper */
-  task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
+ // task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -628,8 +660,6 @@ void digital_inputs_task(void *argument)
 		  digital_data_input_manual[3]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12));
 
 
-
-
 		  if(stats[0] || stats[1] || stats[2]){
 			  if(stats[1] && stats[2])  //Frente
 			 	digital_data_input_manual[1]=2; //a
@@ -647,7 +677,7 @@ void digital_inputs_task(void *argument)
 	  if(flg_ImuGps_Sterr)
 	      steer_info=canRX[7];
 
-		  osDelay(100);
+		  osDelay(50);
 	  }
   /* USER CODE END digital_inputs_task */
 }
@@ -662,35 +692,50 @@ void digital_inputs_task(void *argument)
 void analog_input_task(void *argument)
 {
   /* USER CODE BEGIN analog_input_task */
-  /* Infinite loop */
+	uint16_t ofst_break= 350;
+
+	/* Infinite loop */
   for(;;)
   {
+/*
 	  // Get ADC value
 		  ADC_select_channel_Throttle();
 		  HAL_ADC_Start(&hadc1);
 		  HAL_ADC_PollForConversion(&hadc1, 10);
-		  analog_data_input_manual[3] = HAL_ADC_GetValue(&hadc1);
+		  analog_data_input_manual[5] = 1.0*(HAL_ADC_GetValue(&hadc1)); // 2->4
 		  HAL_ADC_Stop(&hadc1);
 
 	      ADC_select_channel_break();
 		  HAL_ADC_Start(&hadc1);
 		  HAL_ADC_PollForConversion(&hadc1, 10);
-		  analog_data_input_manual[2] = HAL_ADC_GetValue(&hadc1);
+		  analog_data_input_manual[4] = 1.0*(HAL_ADC_GetValue(&hadc1)); //3->5
 		  HAL_ADC_Stop(&hadc1);
-
-		  ADC_select_channel_batery_car();
+*/
+		  ADC_select_channel_batery_car(); // freio
 		  HAL_ADC_Start(&hadc1);
 		  HAL_ADC_PollForConversion(&hadc1, 10);
-		  analog_data_input_manual[4] = HAL_ADC_GetValue(&hadc1);
+		  analog_data_input_manual[2] = 6.5*(HAL_ADC_GetValue(&hadc1));
+   	      if(analog_data_input_manual[2] < ofst_break)
+   	    	analog_data_input_manual[2] = ofst_break;
 		  HAL_ADC_Stop(&hadc1);
 
-		  ADC_select_channel_system_batery();
+		  ADC_select_channel_system_batery();  //acelerador
 		  HAL_ADC_Start(&hadc1);
 		  HAL_ADC_PollForConversion(&hadc1, 10);
-		  analog_data_input_manual[5] = HAL_ADC_GetValue(&hadc1);
+		  analog_data_input_manual[3] = 6.5*(HAL_ADC_GetValue(&hadc1));
+		  if(analog_data_input_manual[3]>4095)
+		  analog_data_input_manual[3]=4095;
 		  HAL_ADC_Stop(&hadc1);
 
-		  HAL_Delay(50);
+
+			vel[0]=2*3.1415*(count_a)/(Nmax_rev*Ts); count_a=0; //  rad/s  // roda direita
+			vel[1]=vel[0]*60/(2*3.1415);//RPM
+
+			vel[2]=2*3.1415*(count_b)/(Nmax_rev*Ts); count_b=0; //  rad/s  // roda esquerda
+			vel[3]=vel[2]*60/(2*3.1415);//RPM
+
+
+		  HAL_Delay(20);
   }
   /* USER CODE END analog_input_task */
 }
@@ -705,7 +750,9 @@ void analog_input_task(void *argument)
 void automatic_manual_mode_Task(void *argument){
   /* USER CODE BEGIN automatic_manual_mode_Task */
   /* Infinite loop */
-  for(;;){
+	uint16_t ofst= 400;
+
+	for(;;){
 
 	  switch(flg){
 
@@ -746,22 +793,28 @@ void automatic_manual_mode_Task(void *argument){
 
                          if(digital_data_input_manual[3]){
             	            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_SET);
-           	            HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, analog_data_input_manual[2]);
+           	                HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, analog_data_input_manual[3]);
                           }else
             	            if(!digital_data_input_manual[3])
-            		        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_RESET);
-     //BREAK
+            	            {
+            	            	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R,  ofst);
+            	            	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_RESET);
+            	            }
+
+            	            //BREAK
                          if(digital_data_input_manual[4]){
                  	    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_SET);
-                            HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_manual[3]);
-                 	  }else
-            	             if(!digital_data_input_manual[4])
-            		         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
+                            HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_manual[2]);
 
+                         }else
+            	             if(!digital_data_input_manual[4]){
+            	            	 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_manual[2]);
+            		             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
+	                          }
 		  break;
 
 	  case 1:
-
+/*
 		  //KEY SWITCH
 		  	    	 switch(digital_data_input_manual[1]){
 		  	//FRENTE
@@ -798,22 +851,22 @@ void automatic_manual_mode_Task(void *argument){
     	   // THROTTLE
 		             if(digital_data_input_auto[3]){
 		            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_SET);
-		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, analog_data_input_auto[2]);
+		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, (4096 - analog_data_input_auto[2]));
 	  	  	     }else
 		                   if(!digital_data_input_auto[3])
 		                      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_RESET);
           //BREAK
 		             if(digital_data_input_auto[4]){
 		            	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_SET);
-		                  HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, analog_data_input_auto[3]);
+		                  HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, (4096 - analog_data_input_auto[3]));
 	  	  	        }else
 	  	  	  	          if(!digital_data_input_auto[4])
 		                       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
-
+*/
 	     break;
 
 	  }
-     osDelay(100);
+     osDelay(40);
   }
   /* USER CODE END automatic_manual_mode_Task */
 }
@@ -1193,6 +1246,9 @@ void signal_pos_stepper(uint32_t pos_){
 	change_period();
 }
 
+
+
+
 void change_period(void){
   /* USER CODE BEGIN TIM2_Init 0 */
 
@@ -1230,6 +1286,8 @@ void change_period(void){
 
 }
 
+
+
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 	if (htim->Instance == TIM3){
 	   if (stepper.direction == DIRECTION_CW) {
@@ -1244,4 +1302,3 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 }
 
 /* USER CODE END Application */
-
