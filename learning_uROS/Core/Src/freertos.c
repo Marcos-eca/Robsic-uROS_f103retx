@@ -37,6 +37,8 @@
 #include "stdbool.h"
 #include <time.h>
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 #include "stepper.h"
 
 #include <rcl/rcl.h>
@@ -73,11 +75,21 @@
 typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
+
+// INICIO - ENVIAR DADOS VELOCIDADE
+uint8_t h[10];
+char str1[10];
+
+
+
+// FIM - ENVIAR DADOS VELOCIDADE
+
+
 int32_t count_a=0,count_pulse_a=0; //DIREITO
 int32_t count_b=0,count_pulse_b=0; //ESQUERDO
 uint32_t Nmax_rev=3600;
 float angle_resolution=0.05;
-float Ts=0.02;
+float Ts=0.01;
 float vel[4]={0,0,0,0};
 
 uint16_t info_interrupt;
@@ -179,6 +191,10 @@ double cmd_vel_buff[2]={0,0}; // buffer
 CAN_TxHeaderTypeDef txHeader; //CAN Bus Transmit Header
 CAN_RxHeaderTypeDef rxHeader; //CAN Bus Receive Header
 uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
+
+unsigned int encoder_abs[2]={0,0}; //{angle,velocity}
+float encoder_abs_f[2]={0,0};
+
 CAN_FilterTypeDef canfil; //CAN Bus Filter
 uint32_t canMailbox; //CAN Bus Mail box variable
 uint8_t steer_info;
@@ -642,6 +658,28 @@ void task_ros2_function(void *argument)
 /* USER CODE END Header_digital_inputs_task */
 uint8_t stats[3]={0,0,0};
 
+
+float hex2float(uint16_t tmp,uint16_t tmp1){
+
+	  encoder_abs[0]=tmp << 8 | tmp1;
+      tmp=encoder_abs[0];
+
+    if(!tmp)
+      return 0;
+    else
+    	if(tmp>0 && tmp<=14398)
+    	   return ((float)tmp*780/14398);
+    	   else
+        if(tmp>14399)
+        	return ((float)(tmp-65535)*780/14398);
+}
+
+
+
+
+
+
+
 void digital_inputs_task(void *argument)
 {
   /* USER CODE BEGIN digital_inputs_task */
@@ -650,8 +688,8 @@ void digital_inputs_task(void *argument)
 	  for(;;){
 
 		  // key switch read
-		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a                                                  -- BRANCO
-		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));   //c (antes pb15)  								  -- VERDE
+		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a             num41                               -- BRANCO
+		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));   //c (antes pb15)  	num42		     			  -- VERDE
 		  stats[2]=!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7));    //d (antes pc6)  agora entrada do buzzer pc7 num 46  -- VERMELHO
 
 		  // break read
@@ -672,12 +710,21 @@ void digital_inputs_task(void *argument)
 
 
 
+			vel[0]=0.3277*2*3.1415*(count_a)/(Nmax_rev*Ts); count_a=0; //  rad/s  // roda direita
+			vel[1]=(vel[0]/0.3277)*60/(2*3.1415);//RPM
 
-        //steer read - temporario : para fins de teste de leitura de dados da rede can.
-	  if(flg_ImuGps_Sterr)
-	      steer_info=canRX[7];
+			vel[2]=0.3492*2*3.1415*(count_b)/(Nmax_rev*Ts); count_b=0; //  rad/s  // roda esquerda
+			vel[3]=vel[2]*60/(2*3.1415);//RPM
 
-		  osDelay(50);
+            //steer read - temporario : para fins de teste de leitura de dados da rede can.
+		    encoder_abs_f[0]=hex2float(canRX[1],canRX[2]);
+
+
+		  if(flg_ImuGps_Sterr)
+	          steer_info=encoder_abs_f[0];
+
+
+		  osDelay(10);
 	  }
   /* USER CODE END digital_inputs_task */
 }
@@ -689,10 +736,12 @@ void digital_inputs_task(void *argument)
 * @retval None
 */
 /* USER CODE END Header_analog_input_task */
+uint16_t ofst_break= 350;
+
 void analog_input_task(void *argument)
 {
   /* USER CODE BEGIN analog_input_task */
-	uint16_t ofst_break= 350;
+
 
 	/* Infinite loop */
   for(;;)
@@ -728,13 +777,6 @@ void analog_input_task(void *argument)
 		  HAL_ADC_Stop(&hadc1);
 
 
-			vel[0]=2*3.1415*(count_a)/(Nmax_rev*Ts); count_a=0; //  rad/s  // roda direita
-			vel[1]=vel[0]*60/(2*3.1415);//RPM
-
-			vel[2]=2*3.1415*(count_b)/(Nmax_rev*Ts); count_b=0; //  rad/s  // roda esquerda
-			vel[3]=vel[2]*60/(2*3.1415);//RPM
-
-
 		  HAL_Delay(20);
   }
   /* USER CODE END analog_input_task */
@@ -747,6 +789,11 @@ void analog_input_task(void *argument)
 * @retval None
 */
 /* USER CODE END Header_automatic_manual_mode_Task */
+
+float sp=0,erro=0,u=0,kp=0;
+float vel_fil_p=0, vel_fil=0, wc=2*3.1415*0.5,Tams=0.04;
+
+
 void automatic_manual_mode_Task(void *argument){
   /* USER CODE BEGIN automatic_manual_mode_Task */
   /* Infinite loop */
@@ -814,6 +861,7 @@ void automatic_manual_mode_Task(void *argument){
 		  break;
 
 	  case 1:
+
 /*
 		  //KEY SWITCH
 		  	    	 switch(digital_data_input_manual[1]){
@@ -848,14 +896,47 @@ void automatic_manual_mode_Task(void *argument){
 
 		  	    	 }
 
-    	   // THROTTLE
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////CONTROLE///////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////CONTROLE///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////CONTROLE/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////CONTROLE/////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//INIT FILTRO
+		          //    vel_fil_p = -wc*vel_fil + wc*vel[0];
+		         //     vel_fil = vel_fil + vel_fil_p*Tams;
+//FIM FILTRO
+
+//INICIO ERRO
+                       erro=sp-vel[0];
+//FIM ERRO
+
+//INICIO - AÇÃO DE CONTROLE
+                       if(erro > 0.1){
+                    	   digital_data_input_auto[3]=1;
+                           u=kp*erro;
+//FIM - AÇÃO DE CONTROLE
+
+                       if( abs(u) > 5 )  u = 5;
+
+                           analog_data_input_auto[2] = abs(u)*4095/5;
+                       }else
+                    	   digital_data_input_auto[3]=0;
+
+
+		  // THROTTLE
 		             if(digital_data_input_auto[3]){
 		            	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_SET);
-		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, (4096 - analog_data_input_auto[2]));
+		                 HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R, (analog_data_input_auto[2]));
 	  	  	     }else
 		                   if(!digital_data_input_auto[3])
-		                      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,GPIO_PIN_RESET);
-          //BREAK
+           	            	   HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1,DAC_ALIGN_12B_R,  ofst);
+
+ /*
+             //BREAK
 		             if(digital_data_input_auto[4]){
 		            	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_SET);
 		                  HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2,DAC_ALIGN_12B_R, (4096 - analog_data_input_auto[3]));
@@ -863,6 +944,13 @@ void automatic_manual_mode_Task(void *argument){
 	  	  	  	          if(!digital_data_input_auto[4])
 		                       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
 */
+
+		             sprintf(str1,"%i %i\n", (int)(1000*sp), (int)(1000*vel[0]));
+		             strcpy(h,str1);
+		             HAL_UART_Transmit(&huart2,h, sizeof(h), 20);
+		             memset(str1,0,sizeof(str1));
+		             memset(h,0,sizeof(h));
+
 	     break;
 
 	  }
@@ -1209,9 +1297,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
   if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &rxHeader, canRX) != HAL_OK){
     Error_Handler();
   }
-     // Ao receber dados de um dispositivo conectado a rede, a "flag_no" informa qual dispositivo enviou os dados que se encontra no buffer canRX onde será
+     // Ao receber dados de um dispositivo conectado a rede can, a "flag_no" informa qual dispositivo enviou os dados que se encontra no buffer canRX onde será
      // direcionado para a callback associada ao nivel lógico da flag.
-  if(rxHeader.StdId == 171)
+  if(rxHeader.StdId == 485)
      flg_ImuGps_Sterr=1;
 
    if(rxHeader.StdId == 0)
