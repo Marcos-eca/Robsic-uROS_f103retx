@@ -22,11 +22,9 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE BEGIN Includes */
-
 #include "usart.h"
 #include "gpio.h"
 #include "dma.h"
@@ -66,7 +64,6 @@
 #include <nav_msgs/msg/odometry.h>
 
 #include <sensor_msgs/msg/joint_state.h>
-
 #include <geometry_msgs/msg/twist.h>
 
 /* USER CODE END Includes */
@@ -75,49 +72,115 @@
 typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
+////////////////////////////////////////
+////////////////////////////////////////
+// INICIO - AQUISIÇÃO DE DADOS DOS SENSORES
+////////////////////////////////////////
+////////////////////////////////////////
 
-// INICIO - ENVIAR DADOS VELOCIDADE
-uint8_t h[10];
-char str1[10];
+// INICIO -  BUFFERS APLICADOS AO MICROROS
+uint8_t flg = 0;             //modo de operação do golfinho manual-0 ; auto-1;
+uint8_t flg_ImuGps_Sterr=0;  //informa qual topico enviou os dados para a placa principal: CAN IMU_GPS - 0 , STEER - 1;
+uint8_t digital_data_input_manual[5] = {0,0,0,0,0};
+uint16_t analog_data_input_manual[6] = {0,0,0,0,0,0};
+uint8_t digital_data_input_auto[5] = {0,0,0,0,0};
+uint16_t analog_data_input_auto[6] = {0,0,0,0,0,0};
+double cmd_vel_buff[2]={0,0};
+// FIM -  BUFFERS APLICADOS AO MICROROS
 
 
+// INICIO - CAN VARIÁVEIS
+CAN_TxHeaderTypeDef txHeader;          //CAN Bus Transmit Header
+CAN_RxHeaderTypeDef rxHeader;          //CAN Bus Receive Header
+uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
 
-// FIM - ENVIAR DADOS VELOCIDADE
+CAN_FilterTypeDef canfil;              //CAN Bus Filter
+uint32_t canMailbox;                   //CAN Bus Mail box variable
+uint8_t  steer_info;
+// INICIO - CAN VARIÁVEIS
+
+// INICIO - MOTOR DE PASSO - VARIÁVEIS
+#define TF_STEPPER_INT  1<<0
+#define TF_STEPPER_DATA 1<<1
+#define TF_MAIN_ROS_CMD 1<<0
+stepper_t stepper;
+// FIM - MOTOR DE PASSO - VARIAVEIS
 
 
-int32_t count_a=0,count_pulse_a=0; //DIREITO
-int32_t count_b=0,count_pulse_b=0; //ESQUERDO
-uint32_t Nmax_rev=3600;
-float angle_resolution=0.05;
-float Ts=0.01;
-float vel[4]={0,0,0,0};
+// INICIO - LEITURA DOS ENCODERS
 
-uint16_t info_interrupt;
+//ENCODER INCREMENTAL
 
+int32_t  count_a=0,count_pulse_a=0; // ENCODER DIREITO
+int32_t  count_b=0,count_pulse_b=0; // ENCODER ESQUERDO
+uint32_t Nmax_rev=3600;             // RESOLUÇÃO
+
+float angle_resolution=0.05, Ts=0.01, vel[4]={0,0,0,0};
+
+// Esta função utiliza interrupção para realizar
+// a leitura dos encoders e registrar o numero de pulsos e sentido
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
-	info_interrupt = GPIO_Pin;
-
-   if(GPIO_Pin == GPIO_PIN_0){
+   if(GPIO_Pin == GPIO_PIN_0){                  // LEITURA DO NUMERO DE PULSOS DO LADO DIREITO
 	   if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1))
-	   { count_a++; count_pulse_a++;}
+	     {count_a++; count_pulse_a++;}
 	   else
-		  {count_a--; count_pulse_a--;}
+		 {count_a--; count_pulse_a--;}
+    }
 
-   }
-
-   if(GPIO_Pin == GPIO_PIN_8){
-	 if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9))
-          {count_b--; count_pulse_b--;}
-	   else
- 		  {count_b++; count_pulse_b++;}
- }
-
+   if(GPIO_Pin == GPIO_PIN_8){                 // LEITURA DO NUMERO DE PULSOS DO LADO ESQUERDO
+	  if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9))
+           {count_b--; count_pulse_b--;}
+	    else
+ 	   	   {count_b++; count_pulse_b++;}
+    }
 }
 
+//ENCODER ABSOLUTO - BUFFER
+unsigned int encoder_abs[2]={0,0};     //{angle,velocity}
+float encoder_abs_f[2]={0,0};
+float hex2float(uint16_t,uint16_t);    //Função de conversão binario para float
+// FIM - LEITURA DOS ENCODERS
+
+// INICIO - ENVIAR DADOS VELOCIDADE - VIA SERIAL
+uint8_t h[10];
+char str1[10];
+// FIM   -  ENVIAR DADOS VELOCIDADE - VIA SERIAL
+
+////////////////////////////////////////
+////////////////////////////////////////
+// FIM - AQUISIÇÃO DE DADOS DOS SENSORES
+////////////////////////////////////////
+////////////////////////////////////////
+
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+//INICIO - VARIÁVEIS DO CONTROLE LONGITUDINAL
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+float sp=0,erro=0,u=0,kp=0;
+float vel_fil_p=0, vel_fil=0, wc=2*3.1415*0.5,Tams=0.04;
+uint16_t ofst_break= 350;
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////FIM - VARIÁVEIS DO CONTROLE LONGITUDINAL
+/////////////////////////////////////////////
+/////////////////////////////////////////////
 HAL_StatusTypeDef status;
 
+float var_stepper_motor = 0, gain_stepper = 16900/(2*780);
+int   flg_spm = 0;
+
 /* USER CODE END PTD */
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+//INICIO - TIPOS DE DADOS APLICADOS AO UROS
+///////////////////////////////////////////
+///////////////////////////////////////////
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
@@ -139,7 +202,6 @@ HAL_StatusTypeDef status;
  *  6 -
  * */
 std_msgs__msg__UInt8MultiArray  golfinho_check_status_msg;
-
 /*
  * Check de sensores do carrinho:
  *  1- Angulo de esterçamento;
@@ -150,60 +212,19 @@ std_msgs__msg__UInt8MultiArray  golfinho_check_status_msg;
  *  6- velocidade angular esquerda;
  * */
 std_msgs__msg__Float32MultiArray golfinho_motion_info_gpio_output_msg;
-
-// imu data
+// IMU data
 sensor_msgs__msg__Imu imu_;
-
-// gps data
-
+// GPS data
 sensor_msgs__msg__NavSatFix gps_;
-
-// joint state data
-
+// Joint state data
 sensor_msgs__msg__JointState joint_steering;
-
 // Twist (comand_vel)
-
 geometry_msgs__msg__Twist cmd_vel;
-
-// operation mode
-
+// Operation mode
 std_msgs__msg__UInt8 operation_mode_;
-
-// odometry
-
+// Odometry
 nav_msgs__msg__Odometry odom;
 
-// buffers
-
-uint8_t flg=0; //modo de operação do golfinho manual-0 ; auto-1;
-uint8_t flg_ImuGps_Sterr=0; //informa qual topico enviou os dados para a placa principal: CAN IMU_GPS - 0 , STEER - 1;
-uint8_t digital_data_input_manual[5]={0,0,0,0,0};
-uint16_t analog_data_input_manual[6]={0,0,0,0,0,0};
-uint8_t digital_data_input_auto[5]={0,0,0,0,0};
-uint16_t analog_data_input_auto[6]={0,0,0,0,0,0};
-
-double cmd_vel_buff[2]={0,0}; // buffer
-
-
-// CAN Variables
-
-CAN_TxHeaderTypeDef txHeader; //CAN Bus Transmit Header
-CAN_RxHeaderTypeDef rxHeader; //CAN Bus Receive Header
-uint8_t canRX[8] = {0,0,0,0,0,0,0,0};  //CAN Bus Receive Buffer
-
-unsigned int encoder_abs[2]={0,0}; //{angle,velocity}
-float encoder_abs_f[2]={0,0};
-
-CAN_FilterTypeDef canfil; //CAN Bus Filter
-uint32_t canMailbox; //CAN Bus Mail box variable
-uint8_t steer_info;
-
-#define TF_STEPPER_INT 1<<0
-#define TF_STEPPER_DATA 1<<1
-#define TF_MAIN_ROS_CMD 1<<0
-
-stepper_t stepper;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -215,36 +236,43 @@ stepper_t stepper;
 /* USER CODE BEGIN Variables */
 
 /* Publisher declaration */
-
 rcl_publisher_t ros2_gpio_input_pub;
 rcl_publisher_t ros2_motion_info_pub;
 rcl_publisher_t ros2_imu_pub;
 rcl_publisher_t ros2_gps_pub;
 rcl_publisher_t ros2_joint_steering_pub;
-
 rcl_publisher_t odom_pub;
 
 /* Subscriber declaration */
-
 rcl_subscription_t cmd_vel_sub;
-
 rcl_subscription_t operation_mode_sub;
 
 /* ROS timer declaration */
-
 rcl_timer_t golfinho_check_status_timer;
 rcl_timer_t golfinho_motion_info_timer;
 rcl_timer_t golfinho_imu_timer;
 rcl_timer_t golfinho_gps_timer;
 rcl_timer_t golfinho_joint_steering_timer;
-
 rcl_timer_t operation_mode_timer;
 rcl_timer_t odom_timer;
-
 HAL_StatusTypeDef status;
+
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+//FIM - TIPOS DE DADOS APLICADOS AO UROS
+///////////////////////////////////////////
+///////////////////////////////////////////
 
 /* USER CODE END Variables */
 /* Definitions for task_ros2 */
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+//INICIO - DEFINIÇÃO DE TAREFAS FREERTOS
+///////////////////////////////////////////
+///////////////////////////////////////////
+
 osThreadId_t task_ros2Handle;
 uint32_t defaultTaskBuffer[ 2100 ];
 osStaticThreadDef_t defaultTaskControlBlock;
@@ -284,27 +312,33 @@ const osThreadAttr_t task_stepper_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+///////////////////////////////////////////
+///////////////////////////////////////////
+//FIM - DEFINIÇÃO DE TAREFAS FREERTOS
+///////////////////////////////////////////
+///////////////////////////////////////////
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+//INICIO - FUNÇÕES APLICADAS AO UROS
+///////////////////////////////////////////
+///////////////////////////////////////////
 
 //Publishers
-
 void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
-
 void odom_callback(rcl_timer_t * timer, int64_t last_call_time);
 
 //Subscribers
-
 void cmd_vel_callback(const void * msgin);
 void operation_mode_callback(const void * msgin);
 
-// Functions used by microros
-
+// Functions used by uros
 bool cubemx_transport_open(struct uxrCustomTransport * transport);
 bool cubemx_transport_close(struct uxrCustomTransport * transport);
 size_t cubemx_transport_write(struct uxrCustomTransport* transport, const uint8_t * buf, size_t len, uint8_t * err);
@@ -315,22 +349,56 @@ void microros_deallocate(void * pointer, void * state);
 void * microros_reallocate(void * pointer, size_t size, void * state);
 void * microros_zero_allocate(size_t number_of_elements, size_t size_of_element, void * state);
 
+///////////////////////////////////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+//FIM - FUNÇÕES APLICADAS AO UROS
+///////////////////////////////////////////
+///////////////////////////////////////////
+
+
+///////////////////////////////////////////
+///////////////////////////////////////////
+//INICIO-FUNÇÕES USADAS NA AQUISIÇÃO DE DADOS ANALOGICOS
+///////////////////////////////////////////
+///////////////////////////////////////////
 
 void ADC_select_channel_break (void);
 void ADC_select_channel_Throttle (void);
 void ADC_select_channel_batery_car(void);
 void ADC_select_channel_system_batery(void);
 
-uint32_t stepper_interval=65000;
+///////////////////////////////////////////
+///////////////////////////////////////////
+//FIM-FUNÇÕES USADAS NA AQUISIÇÃO DE DADOS ANALOGICOS
+///////////////////////////////////////////
+///////////////////////////////////////////
+
+
+uint32_t stepper_interval = 65000;
 void signal_pos_stepper(uint32_t);
 void change_period(void);
 /* USER CODE END FunctionPrototypes */
+
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+//INICIO - CABEÇALHOS DAS TAREFAS CRIADAS NO FREERTOS
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
 void task_ros2_function(void *argument);
 void digital_inputs_task(void *argument);
 void analog_input_task(void *argument);
 void automatic_manual_mode_Task(void *argument);
 void task_stepper_function(void *argument);
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////FIM - CABEÇALHOS DAS TAREFAS CRIADAS NO FREERTOS
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -339,13 +407,13 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   * @param  None
   * @retval None
   */
+
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-	HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
-	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
-	HAL_TIM_Base_Start_IT(&htim2);
-
-    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+	  HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+	  HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+	  HAL_TIM_Base_Start_IT(&htim2);
+ //     HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1); //hj TIM_2
 
    // CAN configuration transmiter
 	  txHeader.DLC = 8;
@@ -368,11 +436,9 @@ void MX_FREERTOS_Init(void) {
 	  HAL_CAN_ConfigFilter(&hcan,&canfil);
 
      // Start Can
-	 HAL_CAN_Start(&hcan);
+	  HAL_CAN_Start(&hcan);
      // Start Callback receive data
-	 if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK){
-		  Error_Handler();
-	 }
+	  if(HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK){Error_Handler();}
 
   /* USER CODE END Init */
 
@@ -406,16 +472,16 @@ void MX_FREERTOS_Init(void) {
   auto_man_modHandle = osThreadNew(automatic_manual_mode_Task, NULL, &auto_man_mod_attributes);
 
   /* creation of task_stepper */
- // task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
+  task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
-
+  stepper.targetPos = 0;
+  osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
-
 }
 
 /* USER CODE BEGIN Header_task_ros2_function */
@@ -428,7 +494,6 @@ void MX_FREERTOS_Init(void) {
 void task_ros2_function(void *argument)
 {
   /* USER CODE BEGIN task_ros2_function */
-
 	// micro-ROS configuration
 		  rmw_uros_set_custom_transport(
 			true,
@@ -528,7 +593,6 @@ void task_ros2_function(void *argument)
 
 
      // Alocação de memória das variáveis criadas pelos tipos std_msgs e outros
-
 	  golfinho_check_status_msg.data.capacity = 5;
 	  golfinho_check_status_msg.data.size = 5;
 	  golfinho_check_status_msg.data.data = (uint8_t*) pvPortMalloc(golfinho_check_status_msg.data.capacity * sizeof(uint8_t));
@@ -541,13 +605,11 @@ void task_ros2_function(void *argument)
 	 		golfinho_check_status_msg.layout.dim.data[i].label.data = (char*) pvPortMalloc(golfinho_check_status_msg.layout.dim.data[i].label.capacity * sizeof(char));
 
 	 	  }
-
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[0].label.data, "reserv");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[1].label.data, "status");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[2].label.data, "op_mod");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[3].label.data, "key_th");
 	 	  strcpy(golfinho_check_status_msg.layout.dim.data[4].label.data, "key_br");
-
 
 		 	golfinho_motion_info_gpio_output_msg.data.capacity = 6;
 		 	golfinho_motion_info_gpio_output_msg.data.size = 6;
@@ -569,7 +631,6 @@ void task_ros2_function(void *argument)
 			 	  strcpy(golfinho_motion_info_gpio_output_msg.layout.dim.data[4].label.data, "bat_car");
 			 	  strcpy(golfinho_motion_info_gpio_output_msg.layout.dim.data[5].label.data, "bat_sys");
 
-
 						int STRING_BUFFER_LEN=10;
 	//imu
 				    	char imu_buffer[STRING_BUFFER_LEN];
@@ -587,7 +648,6 @@ void task_ros2_function(void *argument)
 				    	char child_frame_id[15];
 				    	odom.child_frame_id.data=child_frame_id;
 				    	odom.child_frame_id.capacity=15;
-
 
 				    	// joint_steering
 
@@ -615,7 +675,6 @@ void task_ros2_function(void *argument)
 				    					 	joint_steering.effort.capacity=1;
 				    					 	joint_steering.effort.size=1;
 				    					 	joint_steering.effort.data=(double*) pvPortMalloc(joint_steering.name.capacity * sizeof(double));
-
 
 	  // Create a timer
 	  rclc_timer_init_default(&golfinho_imu_timer, &support, RCL_MS_TO_NS(40), golfinho_imu_timer_callback);
@@ -656,37 +715,36 @@ void task_ros2_function(void *argument)
 * @retval None
 */
 /* USER CODE END Header_digital_inputs_task */
-uint8_t stats[3]={0,0,0};
-
 
 float hex2float(uint16_t tmp,uint16_t tmp1){
-
-	  encoder_abs[0]=tmp << 8 | tmp1;
-      tmp=encoder_abs[0];
-
+	 float ang_res_enc_abs = 0.0625043405792069;
+	 encoder_abs[0]=tmp << 8 | tmp1;
+     tmp=encoder_abs[0];
     if(!tmp)
       return 0;
     else
-    	if(tmp>0 && tmp<=14398)
-    	   return ((float)tmp*780/14398);
-    	   else
-        if(tmp>14399)
-        	return ((float)(tmp-65535)*780/14398);
+      if(tmp>0 && tmp<=14399)
+    	   return ((float)tmp*ang_res_enc_abs);//780/14399);
+    	  else
+           if(tmp>14399)
+              return ((float)(tmp-65535)*ang_res_enc_abs);
 }
 
+// UTILIZADA PARA COLETAR AS INFORMAÇÕES DIGITAIS DO KEY-SWITCH
+uint8_t stats[3]={0,0,0};
 
-
-
-
-
+////REALIZA A LEITURA DA ENTRADAS DIGITAIS
+////REALIZA O CALCULO DE VELOCIDADE DOS ENCODERS
+////RECEBE A ATUALIZAÇÃO DA POSIÇÃO DO ESTERÇAMENTO
 
 void digital_inputs_task(void *argument)
 {
   /* USER CODE BEGIN digital_inputs_task */
   /* Infinite loop */
-	// uint8_t stats[3]={0,0,0};
 	  for(;;){
-
+		  //////////////////////////////////////////
+		  ////INICIO - LEITURA DAS ENTRADAS DIGITAIS
+		  //////////////////////////////////////////
 		  // key switch read
 		  stats[0]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));   //a             num41                               -- BRANCO
 		  stats[1]=!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15));   //c (antes pb15)  	num42		     			  -- VERDE
@@ -707,24 +765,33 @@ void digital_inputs_task(void *argument)
 			    digital_data_input_manual[1]=4; //d
 		  }else
 			  digital_data_input_manual[1]=1;
+		  ///////////////////////////////////////
+		  ////FIM - LEITURA DAS ENTRADAS DIGITAIS
+		  ///////////////////////////////////////
 
-
-
+		    /////////////////////////////////
+		    ////INICIO - CÁLCULO DA VELOCIDADE LINEAR
+		    /////////////////////////////////
 			vel[0]=0.3277*2*3.1415*(count_a)/(Nmax_rev*Ts); count_a=0; //  rad/s  // roda direita
 			vel[1]=(vel[0]/0.3277)*60/(2*3.1415);//RPM
 
 			vel[2]=0.3492*2*3.1415*(count_b)/(Nmax_rev*Ts); count_b=0; //  rad/s  // roda esquerda
 			vel[3]=vel[2]*60/(2*3.1415);//RPM
+			//////////////////////////////////////////
+	        //// FIM - CÁLCULO DA VELOCIDADE LINEAR
+		    //////////////////////////////////////////
 
+			//////////////////////////////////////////////
+			////INICIO - CÁLCULO DA POSIÇÃO DO ESTERÇMENTO
+			//////////////////////////////////////////////
             //steer read - temporario : para fins de teste de leitura de dados da rede can.
-		    encoder_abs_f[0]=hex2float(canRX[1],canRX[2]);
-
-
-		  if(flg_ImuGps_Sterr)
-	          steer_info=encoder_abs_f[0];
-
-
-		  osDelay(10);
+			encoder_abs_f[0]=hex2float(canRX[1],canRX[2]);
+			//Verifica se a informação enviada vem do encoder absoluto
+		    if(flg_ImuGps_Sterr) steer_info=encoder_abs_f[0];
+			//////////////////////////////////////////////
+			////FIM - CÁLCULO DA POSIÇÃO DO ESTERÇMENTO
+			//////////////////////////////////////////////
+		    osDelay(10); //ATUALIZA A CADA 10ms
 	  }
   /* USER CODE END digital_inputs_task */
 }
@@ -736,13 +803,11 @@ void digital_inputs_task(void *argument)
 * @retval None
 */
 /* USER CODE END Header_analog_input_task */
-uint16_t ofst_break= 350;
+
 
 void analog_input_task(void *argument)
 {
   /* USER CODE BEGIN analog_input_task */
-
-
 	/* Infinite loop */
   for(;;)
   {
@@ -760,6 +825,9 @@ void analog_input_task(void *argument)
 		  analog_data_input_manual[4] = 1.0*(HAL_ADC_GetValue(&hadc1)); //3->5
 		  HAL_ADC_Stop(&hadc1);
 */
+	      //////////////////////////////////////////////////////////////
+	      //REALIZA A LEITURA DO FREIO E ESTERÇAMENTO UTILIZANDO POLLING
+	      //////////////////////////////////////////////////////////////
 		  ADC_select_channel_batery_car(); // freio
 		  HAL_ADC_Start(&hadc1);
 		  HAL_ADC_PollForConversion(&hadc1, 10);
@@ -776,8 +844,10 @@ void analog_input_task(void *argument)
 		  analog_data_input_manual[3]=4095;
 		  HAL_ADC_Stop(&hadc1);
 
-
-		  HAL_Delay(20);
+	      //////////////////////////////////////////////////////////////
+	      //REALIZA A LEITURA DO FREIO E ESTERÇAMENTO UTILIZANDO POLLING
+	      //////////////////////////////////////////////////////////////
+		  HAL_Delay(20); //ATUALIZA A CADA 20ms
   }
   /* USER CODE END analog_input_task */
 }
@@ -790,14 +860,20 @@ void analog_input_task(void *argument)
 */
 /* USER CODE END Header_automatic_manual_mode_Task */
 
-float sp=0,erro=0,u=0,kp=0;
-float vel_fil_p=0, vel_fil=0, wc=2*3.1415*0.5,Tams=0.04;
+
+void _teste_stepper_(void){                        //Apenas para verificar o funcionamento dos sinais de controle do motor de passo
+	if(flg_spm){
+        stepper.targetPos = var_stepper_motor*gain_stepper;
+        osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
+        flg_spm = 0;
+	}
+}
 
 
 void automatic_manual_mode_Task(void *argument){
   /* USER CODE BEGIN automatic_manual_mode_Task */
   /* Infinite loop */
-	uint16_t ofst= 400;
+	uint16_t ofst = 400;
 
 	for(;;){
 
@@ -862,42 +938,6 @@ void automatic_manual_mode_Task(void *argument){
 
 	  case 1:
 
-/*
-		  //KEY SWITCH
-		  	    	 switch(digital_data_input_manual[1]){
-		  	//FRENTE
-		  	    	 case 1:
-
-		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
-		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET); //c -- VERDE
-		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET); //d -- VERMELHO
-		  		     break;
-
-		  	    	 case 2:
-
-		     	    	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
-		   	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);   //c -- VERDE
-		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);   //d -- VERMELHO
-		               break;
-		  	// RÉ
-		  	    	 case 3:
-		                        //c
-		  			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
-		  			         	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
-		  			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
-		                      break;
-		  	// NEUTRO
-		  	    	 case 4:
-		                       //D
-		                        	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);     //a -- BRANCO
-		                         	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
-		                           HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
-		               break;
-
-		  	    	 }
-
-*/
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////CONTROLE///////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////CONTROLE///////////////////////////////////////////////////////////////////
@@ -944,17 +984,19 @@ void automatic_manual_mode_Task(void *argument){
 	  	  	  	          if(!digital_data_input_auto[4])
 		                       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1,GPIO_PIN_RESET);
 */
-
+/*
 		             sprintf(str1,"%i %i\n", (int)(1000*sp), (int)(1000*vel[0]));
 		             strcpy(h,str1);
 		             HAL_UART_Transmit(&huart2,h, sizeof(h), 20);
 		             memset(str1,0,sizeof(str1));
 		             memset(h,0,sizeof(h));
-
+*/
 	     break;
 
 	  }
-     osDelay(40);
+     osDelay(100);
+    // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_15);//(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+     _teste_stepper_();
   }
   /* USER CODE END automatic_manual_mode_Task */
 }
@@ -966,34 +1008,40 @@ void automatic_manual_mode_Task(void *argument){
 * @retval None
 */
 /* USER CODE END Header_task_stepper_function */
-void task_stepper_function(void *argument)
-{
+
+uint32_t cfg_v = 48*2*4,cfg_a = 48*2*4;
+
+//cfg_v = 48*2*4,cfg_a = 48*2*4; 16900 -> excursão total
+
+
+
+void task_stepper_function(void *argument){
   /* USER CODE BEGIN task_stepper_function */
 	uint32_t flags;
+	//stepper.currentPos = sensor_enc_abs;
 	stepperInit(&stepper);
-
 	stepperSetSpeed(&stepper, 1);
 	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
-	stepperSetAcceleration(&stepper, 48*2*4);
+	stepperSetAcceleration(&stepper, cfg_a); //48*2*4
 	// Motor = 7.5°/Step, 1/4 Microstepping, speed =  2rev/s,
-	stepperSetMaxSpeed(&stepper, 2*4*48);
+	stepperSetMaxSpeed(&stepper, cfg_v);     //48*2*4
 	stepperSetAbsoluteTartePosition(&stepper, 0);
 	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
 	 HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
 
   /* Infinite loop */
   for(;;){
-	  flags = osThreadFlagsWait((TF_STEPPER_INT | TF_STEPPER_DATA), osFlagsWaitAny, osWaitForever);
+	       flags = osThreadFlagsWait((TF_STEPPER_INT | TF_STEPPER_DATA), osFlagsWaitAny, osWaitForever);
 
-	  if ((flags & TF_STEPPER_INT) == TF_STEPPER_INT){
-		  stepperComputeNewSpeed(&stepper);
-		  signal_pos_stepper(stepper.stepInverval);
-		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
-	  }
-	  if ((flags & TF_STEPPER_DATA) == TF_STEPPER_DATA){
-		  stepperComputeNewSpeed(&stepper);
-		  signal_pos_stepper(stepper.stepInverval);
-		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	       if ((flags & TF_STEPPER_INT) == TF_STEPPER_INT){
+	     	  stepperComputeNewSpeed(&stepper);
+	    	  signal_pos_stepper(stepper.stepInverval);
+	    	  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	         }
+	       if ((flags & TF_STEPPER_DATA) == TF_STEPPER_DATA){
+		     stepperComputeNewSpeed(&stepper);
+		     signal_pos_stepper(stepper.stepInverval);
+		     __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
 	  }
   }
   /* USER CODE END task_stepper_function */
@@ -1012,6 +1060,8 @@ void task_stepper_function(void *argument)
 
 									    					/* ROS CALLBACKS*/
 
+
+
 void operation_mode_callback(const void * msgin){
      const std_msgs__msg__UInt8 *operation_mode_msg;
 	if (msgin != NULL){
@@ -1029,7 +1079,7 @@ void cmd_vel_callback(const void * msgin){
 	    cmd_vel_msg = (const geometry_msgs__msg__Twist *)msgin;
             cmd_vel_buff[0]=cmd_vel_msg->linear.x;  // velocidade linear
             cmd_vel_buff[1]=cmd_vel_msg->angular.z; // posição angular
-            stepper.targetPos=cmd_vel_buff[1];
+            stepper.targetPos = cmd_vel_buff[1];
             osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
             /*
 		 digital_data_input_auto[1]= receive_command_ros_msg->data.data[0]; // key_switch
@@ -1055,12 +1105,12 @@ void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
 		imu_.header.frame_id.size = strlen(imu_.header.frame_id.data);
 
 		if(!flg_ImuGps_Sterr){
-		   imu_.angular_velocity.x=canRX[0];
-		   imu_.angular_velocity.y=canRX[1];
-		   imu_.angular_velocity.z=canRX[2];
-		   imu_.linear_acceleration.x=canRX[3];
-		   imu_.linear_acceleration.y=canRX[4];
-		   imu_.linear_acceleration.z=canRX[5];
+		   imu_.angular_velocity.x = canRX[0];
+		   imu_.angular_velocity.y = canRX[1];
+		   imu_.angular_velocity.z = canRX[2];
+		   imu_.linear_acceleration.x = canRX[3];
+		   imu_.linear_acceleration.y = canRX[4];
+		   imu_.linear_acceleration.z = canRX[5];
 		}
 
 		// Fill the message timestamp
@@ -1076,8 +1126,6 @@ void golfinho_imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
 		}
          }
 }
-
-
 
 void golfinho_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {
@@ -1170,7 +1218,7 @@ void golfinho_joint_steering_timer_callback(rcl_timer_t * timer, int64_t last_ca
 
 
 void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call_time) { // Envia os dados de estados do carrihno para o ros2              // status dos dois modos de operação
-	          if(flg){
+	        if(flg){
 			    golfinho_check_status_msg.data.data[0]=digital_data_input_manual[0];
 			    golfinho_check_status_msg.data.data[1]=digital_data_input_manual[1];//key_switch
 			    golfinho_check_status_msg.data.data[2]=digital_data_input_auto[2];  //op_mode
@@ -1182,9 +1230,9 @@ void golfinho_check_status_timer_callback(rcl_timer_t * timer, int64_t last_call
 			    golfinho_check_status_msg.data.data[2]=digital_data_input_auto[2];   //op_mode
 			    golfinho_check_status_msg.data.data[3]=digital_data_input_manual[3]; //key_throttle
 			    golfinho_check_status_msg.data.data[4]=digital_data_input_manual[4]; //key_break
-                          }
+                  }
 		     // Publish the message
-		    rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub,&golfinho_check_status_msg, NULL);
+		     rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub,&golfinho_check_status_msg, NULL);
 		    if (ret != RCL_RET_OK){
 		       printf("Error publishing gpio inputs (line %d)\n", __LINE__);
 		     }
@@ -1235,12 +1283,11 @@ void golfinho_motion_info_timer_callback(rcl_timer_t * timer, int64_t last_call_
 }
 
 
+//////////////////////////////////////////////////////////////
+//REALIZA A CONFIGURAÇÃO DO CANAL PARA A LEITURA ANALOGICA
+//////////////////////////////////////////////////////////////
 
-
-// As funções ADC alteram o canal do qual conecta o terminal analógico ao registrador que armazena a informação.
-
-void ADC_select_channel_break (void)
-{
+void ADC_select_channel_break (void){
 	ADC_ChannelConfTypeDef sConfig = {0};
 	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
 	  */
@@ -1292,52 +1339,69 @@ void ADC_select_channel_system_batery(void)
 	  }
 }
 
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
-{
-  if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &rxHeader, canRX) != HAL_OK){
-    Error_Handler();
-  }
-     // Ao receber dados de um dispositivo conectado a rede can, a "flag_no" informa qual dispositivo enviou os dados que se encontra no buffer canRX onde será
+//////////////////////////////////////////////////////////////
+//REALIZA A CONFIGURAÇÃO DO CANAL PARA A LEITURA ANALOGICA
+//////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////
+//INCIO - LEITURA DOS SENSORES ATRAVES DA COMUNICAÇÃO CAN
+//////////////////////////////////////////////////////////////
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1){
+  if (HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &rxHeader, canRX) != HAL_OK){Error_Handler();}
+     // Ao receber dados de um dispositivo conectado a rede can, a "flag_no"
+     // informa qual dispositivo enviou os dados que se encontra no buffer canRX onde será
      // direcionado para a callback associada ao nivel lógico da flag.
-  if(rxHeader.StdId == 485)
-     flg_ImuGps_Sterr=1;
-
-   if(rxHeader.StdId == 0)
-       flg_ImuGps_Sterr=0;
+     if(rxHeader.StdId == 485)  flg_ImuGps_Sterr=1;
+     if(rxHeader.StdId == 0)   flg_ImuGps_Sterr=0;
 }
+//////////////////////////////////////////////////////////////
+//FIM - LEITURA DOS SENSORES ATRAVES DA COMUNICAÇÃO CAN
+//////////////////////////////////////////////////////////////
 
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
+
+//////////////////////////////////////////////////////////////
+//INICIO - ESTRATEGIA DE CONTROLE PARA O MOTOR DE PASSO
+//////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//GERADOR DE PULSO POR INTERRUPÇÃO - ESTRATEGIA DE CONTROLE PARA O MOTOR DE PASSO
+//////////////////////////////////////////////////////////////////////////////////
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   /* USER CODE BEGIN Callback 0 */
-
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
-    HAL_IncTick();
-  }
+  if (htim->Instance == TIM1) {HAL_IncTick();}
 
   if (htim->Instance == TIM2) {
-     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-       for(int i=0;i<999;i++);
-         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-     HAL_IncTick();
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);    //troca realizada em jul 28 de GPIO_PIN_13 para GPIO_PIN_15
+      for(int i=0;i<999;i++);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
+      HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
   /* USER CODE END Callback 1 */
 }
+//////////////////////////////////////////////////////////////////////////////////
+//GERADOR DE PULSO POR INTERRUPÇÃO - ESTRATEGIA DE CONTROLE PARA O MOTOR DE PASSO
+//////////////////////////////////////////////////////////////////////////////////
 
-uint32_t stepper_interval;
+
+//////////////////////////////////////////////////////////////////////////////////
+//INCIO - CALCULA A DISTÂNCIA ENTRE OS PULSOS
+//////////////////////////////////////////////////////////////////////////////////
+
+//uint32_t stepper_interval;
+
 void signal_pos_stepper(uint32_t pos_){
-	stepper_interval=pos_;
-	htim2.Instance->ARR=stepper_interval;
-	change_period();
+	  stepper_interval = pos_;
+	  htim2.Instance->ARR = stepper_interval;
+	  change_period();
 }
 
-
-
-
-void change_period(void){
+void change_period(void){  //Distância entre os pulsos
   /* USER CODE BEGIN TIM2_Init 0 */
 
   /* USER CODE END TIM2_Init 0 */
@@ -1369,24 +1433,73 @@ void change_period(void){
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-
   /* USER CODE END TIM2_Init 2 */
-
 }
+//////////////////////////////////////////////////////////////////////////////////
+//FIM - CALCULA A DISTÂNCIA ENTRE OS PULSOS
+//////////////////////////////////////////////////////////////////////////////////
 
 
 
+
+/////////////////////////////////////////////////////////////////
+//INICIO - DIREÇÃO - SENTIDD DE GIRO DO MOTOR DE PASSO
+/////////////////////////////////////////////////////////////////
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
-	if (htim->Instance == TIM3){
-	   if (stepper.direction == DIRECTION_CW) {
-		stepper.currentPos++;
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
-	    } else {
+	if(htim->Instance == TIM3){
+	   if(stepper.direction == DIRECTION_CW){
+		     stepper.currentPos++;
+		     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+	    }else{
 		     stepper.currentPos--;
 		     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
-		   }
-	osThreadFlagsSet(task_stepperHandle, TF_STEPPER_INT);
+		}
+	    osThreadFlagsSet(task_stepperHandle, TF_STEPPER_INT);
 	}
 }
+/////////////////////////////////////////////////////////////////
+//FIM - DIREÇÃO - SENTIDD DE GIRO DO MOTOR DE PASSO
+/////////////////////////////////////////////////////////////////
 
+
+//////////////////////////////////////////////////////////////
+//FIM - ESTRATEGIA DE CONTROLE PARA O MOTOR DE PASSO
+//////////////////////////////////////////////////////////////
+
+
+/*
+		  //KEY SWITCH
+		  	    	 switch(digital_data_input_manual[1]){
+		  	//FRENTE
+		  	    	 case 1:
+
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET); //c -- VERDE
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_RESET); //d -- VERMELHO
+		  		     break;
+
+		  	    	 case 2:
+
+		     	    	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET); //a -- BRANCO
+		   	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_SET);   //c -- VERDE
+		  	              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);   //d -- VERMELHO
+		               break;
+		  	// RÉ
+		  	    	 case 3:
+		                        //c
+		  			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_SET);     //a -- BRANCO
+		  			         	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
+		  			              HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
+		                      break;
+		  	// NEUTRO
+		  	    	 case 4:
+		                       //D
+		                        	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2,GPIO_PIN_RESET);     //a -- BRANCO
+		                         	 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3,GPIO_PIN_RESET);   //c -- VERDE
+		                           HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,GPIO_PIN_SET);     //d -- VERMELHO
+		               break;
+
+		  	    	 }
+
+*/
 /* USER CODE END Application */
