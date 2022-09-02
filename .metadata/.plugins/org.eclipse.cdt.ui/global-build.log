@@ -1,111 +1,1421 @@
-12:51:05 **** Incremental Build of configuration Debug for project learning_uROS ****
+11:18:33 **** Incremental Build of configuration Debug for project data_velocity ****
 make -j8 all 
-docker run --rm -v "/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
 micro-ROS library found. Skipping...
 Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
  
-arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
-../Core/Src/freertos.c: In function 'task_ros2_function':
-../Core/Src/freertos.c:403:52: warning: assignment to 'float *' from incompatible pointer type 'uint16_t *' {aka 'short unsigned int *'} [-Wincompatible-pointer-types]
-  403 |     golfinho_motion_info_gpio_output_msg.data.data = (uint16_t*) pvPortMalloc(golfinho_motion_info_gpio_output_msg.data.capacity * sizeof(uint16_t));
-      |                                                    ^
-../Core/Src/freertos.c: In function 'golfinho_motion_info_timer_callback':
-../Core/Src/freertos.c:735:8: warning: this 'else' clause does not guard... [-Wmisleading-indentation]
-  735 |        else
-      |        ^~~~
-../Core/Src/freertos.c:738:5: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'else'
-  738 |     golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
 ../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
-../Core/Src/freertos.c:784:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
-  784 |   clock_gettime(CLOCK_REALTIME, &ts);
+../Core/Src/freertos.c:1081:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1081 |   clock_gettime(CLOCK_REALTIME, &ts);
       |   ^~~~~~~~~~~~~
-../Core/Src/freertos.c: In function 'golfinho_joint_steering_timer_callback':
-../Core/Src/freertos.c:831:21: warning: unused variable 'data2' [-Wunused-variable]
-  831 |  double data0,data1,data2;
-      |                     ^~~~~
-../Core/Src/freertos.c:831:15: warning: unused variable 'data1' [-Wunused-variable]
-  831 |  double data0,data1,data2;
-      |               ^~~~~
-../Core/Src/freertos.c:831:9: warning: unused variable 'data0' [-Wunused-variable]
-  831 |  double data0,data1,data2;
-      |         ^~~~~
-../Core/Src/freertos.c: In function 'task_ros2_function':
-../Core/Src/freertos.c:324:4: warning: ignoring return value of 'rcl_init_options_init', declared with attribute warn_unused_result [-Wunused-result]
-  324 |    rcl_init_options_init(&init_options, allocator);
-      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arm-none-eabi-gcc -o "learning_uROS.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="learning_uROS.map" -Wl,--gc-sections -static -L"/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: learning_uROS.elf
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
  
-arm-none-eabi-size   learning_uROS.elf 
-arm-none-eabi-objdump -h -S  learning_uROS.elf  > "learning_uROS.list"
-arm-none-eabi-objcopy  -O binary  learning_uROS.elf  "learning_uROS.bin"
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
    text	   data	    bss	    dec	    hex	filename
- 107304	    704	  59272	 167280	  28d70	learning_uROS.elf
+ 121508	    852	  61704	 184064	  2cf00	data_velocity.elf
 Finished building: default.size.stdout
  
-Finished building: learning_uROS.bin
+Finished building: data_velocity.bin
  
-Finished building: learning_uROS.list
+Finished building: data_velocity.list
  
-12:51:18 **** Incremental Build of configuration Debug for project learning_uROS ****
+11:19:38 **** Incremental Build of configuration Debug for project data_velocity ****
 make -j8 all 
-docker run --rm -v "/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
 micro-ROS library found. Skipping...
 Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
  
-arm-none-eabi-size   learning_uROS.elf 
+arm-none-eabi-size   data_velocity.elf 
    text	   data	    bss	    dec	    hex	filename
- 107304	    704	  59272	 167280	  28d70	learning_uROS.elf
+ 121508	    852	  61704	 184064	  2cf00	data_velocity.elf
 Finished building: default.size.stdout
  
-14:03:51 **** Incremental Build of configuration Debug for project learning_uROS ****
+11:30:22 **** Incremental Build of configuration Debug for project data_velocity ****
 make -j8 all 
-docker run --rm -v "/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
 micro-ROS library found. Skipping...
 Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
  
-arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
-../Core/Src/freertos.c: In function 'task_ros2_function':
-../Core/Src/freertos.c:402:52: warning: assignment to 'float *' from incompatible pointer type 'uint16_t *' {aka 'short unsigned int *'} [-Wincompatible-pointer-types]
-  402 |     golfinho_motion_info_gpio_output_msg.data.data = (uint16_t*) pvPortMalloc(golfinho_motion_info_gpio_output_msg.data.capacity * sizeof(uint16_t));
-      |                                                    ^
-../Core/Src/freertos.c: In function 'golfinho_motion_info_timer_callback':
-../Core/Src/freertos.c:734:8: warning: this 'else' clause does not guard... [-Wmisleading-indentation]
-  734 |        else
-      |        ^~~~
-../Core/Src/freertos.c:737:5: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'else'
-  737 |     golfinho_motion_info_gpio_output_msg.data.data[4]=analog_data_input_manual[4]*100/4096; // batery car
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
 ../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
-../Core/Src/freertos.c:783:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
-  783 |   clock_gettime(CLOCK_REALTIME, &ts);
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
       |   ^~~~~~~~~~~~~
-../Core/Src/freertos.c: In function 'golfinho_joint_steering_timer_callback':
-../Core/Src/freertos.c:830:21: warning: unused variable 'data2' [-Wunused-variable]
-  830 |  double data0,data1,data2;
-      |                     ^~~~~
-../Core/Src/freertos.c:830:15: warning: unused variable 'data1' [-Wunused-variable]
-  830 |  double data0,data1,data2;
-      |               ^~~~~
-../Core/Src/freertos.c:830:9: warning: unused variable 'data0' [-Wunused-variable]
-  830 |  double data0,data1,data2;
-      |         ^~~~~
-../Core/Src/freertos.c: In function 'task_ros2_function':
-../Core/Src/freertos.c:323:4: warning: ignoring return value of 'rcl_init_options_init', declared with attribute warn_unused_result [-Wunused-result]
-  323 |    rcl_init_options_init(&init_options, allocator);
-      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arm-none-eabi-gcc -o "learning_uROS.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="learning_uROS.map" -Wl,--gc-sections -static -L"/home/robotica8/STM32CubeIDE/workspace_1.8.0/learning_uROS/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: learning_uROS.elf
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
  
-arm-none-eabi-size   learning_uROS.elf 
-arm-none-eabi-objdump -h -S  learning_uROS.elf  > "learning_uROS.list"
-arm-none-eabi-objcopy  -O binary  learning_uROS.elf  "learning_uROS.bin"
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
    text	   data	    bss	    dec	    hex	filename
- 107304	    704	  59272	 167280	  28d70	learning_uROS.elf
+ 121588	    852	  61704	 184144	  2cf50	data_velocity.elf
 Finished building: default.size.stdout
  
-Finished building: learning_uROS.bin
+Finished building: data_velocity.bin
  
-Finished building: learning_uROS.list
+Finished building: data_velocity.list
+ 
+11:31:01 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121588	    852	  61704	 184144	  2cf50	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+11:36:21 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121556	    852	  61704	 184112	  2cf30	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+11:40:37 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121556	    852	  61704	 184112	  2cf30	data_velocity.elf
+Finished building: default.size.stdout
+ 
+11:49:10 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121588	    852	  61704	 184144	  2cf50	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:29:37 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121604	    852	  61704	 184160	  2cf60	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:30:50 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121620	    852	  61704	 184176	  2cf70	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:34:22 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121620	    852	  61704	 184176	  2cf70	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:36:46 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121620	    852	  61704	 184176	  2cf70	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:40:42 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121620	    852	  61704	 184176	  2cf70	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:44:02 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121620	    852	  61704	 184176	  2cf70	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:47:17 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121620	    852	  61704	 184176	  2cf70	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:54:41 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121700	    852	  61704	 184256	  2cfc0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:57:17 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121700	    852	  61704	 184256	  2cfc0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+12:59:57 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:01:58 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:03:56 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:10:27 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:12:24 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:13:31 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+13:30:13 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121668	    852	  61704	 184224	  2cfa0	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:40:22 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121780	    852	  61704	 184336	  2d010	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:42:04 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121764	    852	  61704	 184320	  2d000	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:47:08 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c:717:1: error: unknown type name 'flloat'; did you mean 'float'?
+  717 | flloat varenc;
+      | ^~~~~~
+      | float
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1087:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1087 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+make[1]: *** [Core/Src/subdir.mk:76: Core/Src/freertos.o] Error 1
+make: *** [makefile:63: all] Error 2
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+13:47:20 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1087:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1087 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:48:49 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121780	    852	  61704	 184336	  2d010	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:54:09 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:54:47 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:56:42 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121780	    852	  61704	 184336	  2d010	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:10:59 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:20:15 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:21:17 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121796	    852	  61704	 184352	  2d020	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:26:23 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:26:40 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+14:27:45 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:28:27 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:29:08 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:29:30 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+14:30:02 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:30:45 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:32:13 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:32:46 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121860	    852	  61704	 184416	  2d060	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:35:18 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:37:25 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:38:58 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+14:42:19 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'digital_inputs_task':
+../Core/Src/freertos.c:766:77: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813))/1000;}
+      |                                                                             ^
+../Core/Src/freertos.c:766:53: error: too few arguments to function 'hex2float'
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813))/1000;}
+      |                                                     ^~~~~~~~~
+../Core/Src/freertos.c:695:7: note: declared here
+  695 | float hex2float(uint16_t tmp,uint16_t tmp1){
+      |       ^~~~~~~~~
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+make[1]: *** [Core/Src/subdir.mk:76: Core/Src/freertos.o] Error 1
+make: *** [makefile:63: all] Error 2
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:42:45 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'digital_inputs_task':
+../Core/Src/freertos.c:766:77: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813))/1000;}
+      |                                                                             ^
+../Core/Src/freertos.c:766:53: error: too few arguments to function 'hex2float'
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813))/1000;}
+      |                                                     ^~~~~~~~~
+../Core/Src/freertos.c:695:7: note: declared here
+  695 | float hex2float(uint16_t tmp,uint16_t tmp1){
+      |       ^~~~~~~~~
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+make[1]: *** [Core/Src/subdir.mk:76: Core/Src/freertos.o] Error 1
+make: *** [makefile:63: all] Error 2
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:43:15 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'digital_inputs_task':
+../Core/Src/freertos.c:766:77: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813)))/1000;}
+      |                                                                             ^
+../Core/Src/freertos.c:766:53: error: too few arguments to function 'hex2float'
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813)))/1000;}
+      |                                                     ^~~~~~~~~
+../Core/Src/freertos.c:695:7: note: declared here
+  695 | float hex2float(uint16_t tmp,uint16_t tmp1){
+      |       ^~~~~~~~~
+../Core/Src/freertos.c:766:98: error: expected ';' before ')' token
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813)))/1000;}
+      |                                                                                                  ^
+      |                                                                                                  ;
+../Core/Src/freertos.c:766:98: error: expected statement before ')' token
+../Core/Src/freertos.c:766:99: error: expected expression before '/' token
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2]) - 12.813)))/1000;}
+      |                                                                                                   ^
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+make[1]: *** [Core/Src/subdir.mk:76: Core/Src/freertos.o] Error 1
+make: *** [makefile:63: all] Error 2
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:43:52 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'digital_inputs_task':
+../Core/Src/freertos.c:766:77: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2] - 12.813)))/1000;}
+      |                                                                             ^
+../Core/Src/freertos.c:766:53: error: too few arguments to function 'hex2float'
+  766 |       if(flg_ImuGps_Sterr){encoder_abs_f[0] = trunc(hex2float(1000*(canRX[1],canRX[2] - 12.813)))/1000;}
+      |                                                     ^~~~~~~~~
+../Core/Src/freertos.c:695:7: note: declared here
+  695 | float hex2float(uint16_t tmp,uint16_t tmp1){
+      |       ^~~~~~~~~
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+make[1]: *** [Core/Src/subdir.mk:76: Core/Src/freertos.o] Error 1
+make: *** [makefile:63: all] Error 2
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:44:18 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:11:23 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+13:12:10 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+13:20:11 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121796	    852	  61704	 184352	  2d020	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:21:12 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121828	    852	  61704	 184384	  2d040	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:21:51 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1086:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1086 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121844	    852	  61704	 184400	  2d050	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:27:15 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1087:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1087 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121828	    852	  61704	 184384	  2d040	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:30:17 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1087:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1087 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121812	    852	  61704	 184368	  2d030	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:33:45 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-gcc "../Core/Src/freertos.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include" -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/freertos.d" -MT"Core/Src/freertos.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/freertos.o"
+../Core/Src/freertos.c: In function 'golfinho_imu_timer_callback':
+../Core/Src/freertos.c:1089:3: warning: implicit declaration of function 'clock_gettime' [-Wimplicit-function-declaration]
+ 1089 |   clock_gettime(CLOCK_REALTIME, &ts);
+      |   ^~~~~~~~~~~~~
+arm-none-eabi-gcc -o "data_velocity.elf" @"objects.list"  -lmicroros -mcpu=cortex-m3 -T"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="data_velocity.map" -Wl,--gc-sections -static -L"/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: data_velocity.elf
+ 
+arm-none-eabi-size   data_velocity.elf 
+arm-none-eabi-objdump -h -S  data_velocity.elf  > "data_velocity.list"
+arm-none-eabi-objcopy  -O binary  data_velocity.elf  "data_velocity.bin"
+   text	   data	    bss	    dec	    hex	filename
+ 121860	    852	  61704	 184416	  2d060	data_velocity.elf
+Finished building: default.size.stdout
+ 
+Finished building: data_velocity.bin
+ 
+Finished building: data_velocity.list
+ 
+13:36:35 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121860	    852	  61704	 184416	  2d060	data_velocity.elf
+Finished building: default.size.stdout
+ 
+13:38:55 **** Incremental Build of configuration Debug for project data_velocity ****
+make -j8 all 
+docker run --rm -v "/home/robsic/STM32CubeIDE/data_aquisition_cart_golf/data_velocity":/project --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library_ide microros/micro_ros_static_library_builder:foxy
+micro-ROS library found. Skipping...
+Delete micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/ for rebuild.
+ 
+arm-none-eabi-size   data_velocity.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 121860	    852	  61704	 184416	  2d060	data_velocity.elf
+Finished building: default.size.stdout
  

@@ -1,5 +1,15 @@
-status
 canRX
-txHeader
-rxHeader
-csend
+rxHeader.StdId
+var_stepper_motor
+flg_spm
+stepper_interval
+stepper
+encoder_abs_f[0]
+ cmd_vel_buff[0]
+ cmd_vel_buff[1]
+ app_golfin[0]
+ app_golfin[1]
+rc1
+rc2
+data0
+cmd_a

@@ -10,12 +10,13 @@
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2021 STMicroelectronics.
- * All rights reserved.
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
  *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
  *
  ******************************************************************************
  */
@@ -32,13 +33,18 @@
 
 
 /* Variables */
+//#undef errno
+extern int errno;
 extern int __io_putchar(int ch) __attribute__((weak));
 extern int __io_getchar(void) __attribute__((weak));
 
+register char * stack_ptr asm("sp");
 
 char *__env[1] = { 0 };
 char **environ = __env;
 
+extern char _estack;  // see ld file
+extern char _Min_Stack_Size;  // see ld file
 
 /* Functions */
 void initialise_monitor_handles()
@@ -83,6 +89,27 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
 		__io_putchar(*ptr++);
 	}
 	return len;
+}
+
+caddr_t _sbrk(int incr) {
+    extern char __heap_start__ asm("end");  // Defined by the linker.
+    static char *heap_end;
+    char *prev_heap_end;
+
+    if (heap_end == NULL) heap_end = &__heap_start__;
+
+    prev_heap_end = heap_end;
+
+    if (heap_end + incr > &_estack - _Min_Stack_Size) {
+    		__asm("BKPT #0\n");
+        errno = ENOMEM;
+        return (caddr_t)-1;
+
+    }
+
+    heap_end += incr;
+    return (caddr_t)prev_heap_end;
+
 }
 
 int _close(int file)

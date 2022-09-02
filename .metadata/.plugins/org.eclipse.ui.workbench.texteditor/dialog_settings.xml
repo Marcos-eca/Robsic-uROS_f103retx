@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="digital_data_input_manual"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
+		<item key="selection" value="gain_stepper"/>
 		<list key="findhistory">
-			<item value="digital_data_input_auto"/>
-			<item value="digital_data_input_manual"/>
-			<item value="UInt16MultiArray"/>
-			<item value="imu_car"/>
-			<item value="imu_car_pub"/>
-			<item value="ADC_select_channel_batery"/>
-			<item value="Float32MultiArray"/>
+			<item value="gain_stepper"/>
+			<item value="encoder_abs_f[0]"/>
+			<item value="gps_"/>
+			<item value="ros2_gpio_input_pub"/>
+			<item value="ros2_gps_pub"/>
+			<item value="digital_data_input_manual[4]"/>
+			<item value="digital_data_input_manual[3]"/>
+			<item value="digital_data_input_auto[4]"/>
+			<item value="digital_data_input_auto[3]"/>
+			<item value="digital_data_input_manual[1]"/>
 			<item value="analog_data_input_manual"/>
-			<item value="golfinho_check_status_msg"/>
-			<item value="receive_commands_from_ros_sub"/>
-			<item value="receive"/>
-			<item value="ros2_gpio_output_msg"/>
-			<item value="ros2_gpio_input_msg"/>
-			<item value="golfinho_motion_info_timer"/>
-			<item value="golfinho_check_status"/>
+			<item value="analog_data_input_auto[3]"/>
+			<item value="analog_data_input_auto[2]"/>
+			<item value="golfinho_motion_status_gps_msg"/>
+			<item value="steer_info"/>
 		</list>
 		<list key="replacehistory">
+			<item value="ros2_motion_status_gps_pub"/>
+			<item value="golfinho_motion_status_gps_timer"/>
+			<item value="golfinho_motion_status_gps_msg"/>
+			<item value="golfinho_motion_info_gpio_output_msg"/>
+			<item value="velocity_and_voltage"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1506"/>
-		<item key="DIALOG_Y_ORIGIN" value="656"/>
-		<item key="DIALOG_WIDTH" value="348"/>
+		<item key="DIALOG_X_ORIGIN" value="1080"/>
+		<item key="DIALOG_Y_ORIGIN" value="28"/>
+		<item key="DIALOG_WIDTH" value="588"/>
 		<item key="DIALOG_HEIGHT" value="437"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
 	</section>

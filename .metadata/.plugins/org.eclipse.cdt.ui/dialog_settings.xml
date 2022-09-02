@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<item key="org.eclipse.cdt.utils.ui.controls.FileListControl" value="${PWD}/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros"/>
+	<item key="org.eclipse.cdt.utils.ui.controls.FileListControl" value="&quot;${PWD}/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros&quot;"/>
 	<section name="completion_proposal_size">
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
 	</section>
-	<section name="OptionalMessageDialog.hide.">
-		<item key="askReindex.detail" value="0"/>
-	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration.internal">
-		<item key="size.width" value="521"/>
+		<item key="size.width" value="721"/>
 		<item key="size.height" value="180"/>
+	</section>
+	<section name="PDOMSearchPage">
 	</section>
 </section>
